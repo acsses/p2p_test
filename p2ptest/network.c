@@ -124,19 +124,21 @@ int getmacaddr(char ifname[],unsigned char buf[]){
 
     ifend = ifs + (ifc.ifc_len / sizeof(struct ifreq));
     for (ifr = ifc.ifc_req; ifr < ifend; ifr++) {
-	if (ifr->ifr_addr.sa_family == AF_INET) {
-	    strncpy(ifreq.ifr_name, ifr->ifr_name, sizeof(ifreq.ifr_name));
-	    if (ioctl (sock, SIOCGIFHWADDR, &ifreq) < 0) {
-		return 1;
+	    if (ifr->ifr_addr.sa_family == AF_INET) {
+	        strncpy(ifreq.ifr_name, ifr->ifr_name, sizeof(ifreq.ifr_name));
+	        if (ioctl (sock, SIOCGIFHWADDR, &ifreq) < 0) {
+	    	    return 1;
+	        }
+            if(strcmp(ifr->ifr_name,ifname)==0){
+                addr = ifreq.ifr_hwaddr.sa_data;
+                buf[0] = addr[0];
+                buf[1] = addr[1];
+                buf[2] = addr[2];
+                buf[3] = addr[3];
+                buf[4] = addr[4];
+                buf[5] = addr[5]; 
+            }
 	    }
-            addr = ifreq.ifr_hwaddr.sa_data;
-            buf[0] = addr[0];
-            buf[1] = addr[1];
-            buf[2] = addr[2];
-            buf[3] = addr[3];
-            buf[4] = addr[4];
-            buf[5] = addr[5]; 
-	}
     }
     return 0;
 

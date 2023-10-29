@@ -129,8 +129,8 @@ int getmacaddr(char ifname[],unsigned char buf[]){
 	        if (ioctl (sock, SIOCGIFHWADDR, &ifreq) < 0) {
 	    	    return 1;
 	        }
-            if(strcmp(ifr->ifr_name,ifname)==0){
-                addr = ifreq.ifr_hwaddr.sa_data;
+            addr = ifreq.ifr_hwaddr.sa_data;
+            if(strcmp(ifreq.ifr_name,ifname)==0){
                 buf[0] = addr[0];
                 buf[1] = addr[1];
                 buf[2] = addr[2];

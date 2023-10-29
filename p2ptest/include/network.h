@@ -11,8 +11,27 @@
 #include <sys/ioctl.h>
 #include <netdb.h>
 #include <netinet/in.h>
+#include <netinet/if_ether.h>
+#include <netinet/ip.h>
+#include <net/if_arp.h> 
 #include <net/if.h>
-#include <unistd.h>
+#include <unistd.h> 
+#include <arpa/inet.h>
+#include <errno.h>
+
+#if defined(__APPLE__)
+
+    #include <ifaddrs.h>
+    #include <net/if_dl.h>
+    #include <net/if_types.h>
+
+#elif defined(__linux__)
+
+    #define  MAX_IFS 20
+
+#endif
+
+#include "include/timeutil.h"
 /*--     include libs     --*/
 
     

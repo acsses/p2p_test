@@ -107,6 +107,13 @@ int getmacaddr(char ifname[],unsigned char buf[]){
 #elif defined(__linux__)
 
 int getmacaddr(char ifname[],unsigned char buf[]){
+    struct ifreq *ifr, *ifend;
+    struct ifreq ifreq;
+    struct ifconf ifc;
+    struct ifreq ifs[MAX_IFS];
+    int sock;
+    unsigned char *addr;
+
     sock = socket(AF_INET, SOCK_DGRAM, 0);
     ifc.ifc_len = sizeof(ifs);
     ifc.ifc_req = ifs;

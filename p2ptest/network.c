@@ -22,6 +22,7 @@
 
 #elif defined(__linux__)
 
+    #define  MAX_IFS 20
 
 #endif
 
@@ -125,7 +126,7 @@ int getmacaddr(char ifname[],unsigned char buf[]){
     for (ifr = ifc.ifc_req; ifr < ifend; ifr++) {
 	if (ifr->ifr_addr.sa_family == AF_INET) {
 	    strncpy(ifreq.ifr_name, ifr->ifr_name, sizeof(ifreq.ifr_name));
-	    if (ioctl (SockFD, SIOCGIFHWADDR, &ifreq) < 0) {
+	    if (ioctl (sock, SIOCGIFHWADDR, &ifreq) < 0) {
 		return 1;
 	    }
             addr = ifreq.ifr_hwaddr.sa_data;

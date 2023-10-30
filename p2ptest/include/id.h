@@ -8,13 +8,22 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <net/if.h>
-#include <net/if_dl.h>
-#include <net/if_types.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <unistd.h>  
 #include <sys/ioctl.h>
-#include <ifaddrs.h>
+
+#if defined(__APPLE__)
+
+    #include <ifaddrs.h>
+    #include <net/if_dl.h>
+    #include <net/if_types.h>
+
+#elif defined(__linux__)
+
+    #define  MAX_IFS 20
+
+#endif
 
 #include "network.h"
 #include "sha256.h"

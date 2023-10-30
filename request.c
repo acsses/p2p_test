@@ -66,7 +66,6 @@ int messageReqNodeList(char disc_server_list[][256],int status,struct json_objec
     int d=0;
     int i=0;
     while(d==0){
-        printf("%s\n",disc_server_list[i]);
         d=(disc_server_list[i][0]=='\0');
         if(d==1){
             break;
@@ -95,6 +94,7 @@ int messageReqNodeList(char disc_server_list[][256],int status,struct json_objec
             "}",
             id,status
         );
+
         if(DEV_MODE){
             snprintf(url,256,"http://%s/api/nodes",disc_server_list[i]);
             snprintf(header,1024,

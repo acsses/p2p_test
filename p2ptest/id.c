@@ -29,16 +29,18 @@
 
 int getid(char buf[]){
     struct ifaddrs *ifa_list, *ifa; 
-    struct sockaddr_dl *dl; 
+    struct sockaddr_dl *dl;
     unsigned char *addr;
     char name[12];
-    unsigned char src_[256];
+    unsigned char src_[128];
     if (getifaddrs(&ifa_list) < 0) {
         return 1;
     }
     long int j=0;
+
     for (ifa = ifa_list; ifa != NULL; ifa = ifa->ifa_next) { 
         dl = (struct sockaddr_dl*)ifa->ifa_addr; 
+
         if (dl->sdl_family == AF_LINK && dl->sdl_type == IFT_ETHER) {
             memcpy(name, dl->sdl_data, dl->sdl_nlen);
             name[dl->sdl_nlen] = '\0';
@@ -54,7 +56,7 @@ int getid(char buf[]){
     } 
     freeifaddrs(ifa_list); 
     unsigned char src[j*6];
-    for(int l=0;l<32;++l){
+    for(int l=0;l<j*6+1;++l){
         src[l]=src_[l];
     }
     sha256hex(src,sizeof(src),buf);
@@ -70,7 +72,7 @@ int getid(char buf[]){
     struct ifreq ifs[MAX_IFS];
     int sock;
     unsigned char *addr;
-    unsigned char src_[256];
+    unsigned char src_[6*MAX_IFS];
 
     sock = socket(AF_INET, SOCK_DGRAM, 0);
     ifc.ifc_len = sizeof(ifs);
@@ -98,7 +100,7 @@ int getid(char buf[]){
 	    }
     }
     unsigned char src[j*6];
-    for(int l=0;l<32;++l){
+    for(int l=0;l<j*6+1;++l){
         src[l]=src_[l];
     }
     sha256hex(src,sizeof(src),buf);

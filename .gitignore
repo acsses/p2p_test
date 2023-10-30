@@ -1,4 +1,4 @@
 request
-python/build
-python/dist
-python/p2ptest.egg-info
+python/build/
+python/dist/
+python/p2ptest.egg-info/

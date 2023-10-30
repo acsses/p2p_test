@@ -33,13 +33,13 @@ int parseSsdp(char target[],struct ssdp *ssdp){
     int i=0;
     int start=0;
 
-    for(i=0;i<strlen(target);++i){
+    for(i=0;i<(int)strlen(target);++i){
         if(target[i]=='\r'){
             char l[i-start];
             snprintf(l,i-start+1,"%s",target+start);
             int j=0;
             int colon=0;
-            for(j=0;j<strlen(l);++j){
+            for(j=0;j<(int)strlen(l);++j){
                 if(l[j]==':'){
                     colon=j+2;
                     if(strstr(l,"LOCATION")){
@@ -79,13 +79,13 @@ int parseHttp(char response[],Http *http){
     int start=0;
     int i=0;
     
-    for (n=0;n<strlen(response);++n){
+    for (n=0;n<(int)strlen(response);++n){
         if(response[n]=='\r'){
             char l[n-start];
             snprintf(l,n-start+1,"%s",response+start);
             int j=0;
             int colon=0;
-            for(j=0;j<strlen(l);++j){
+            for(j=0;j<(int)strlen(l);++j){
                 if(l[j]==':'){
                     colon=j+2;
                     if(strstr(l,"Content-Type")){
@@ -262,7 +262,7 @@ struct json_object * parseJson(char buf[],char search[],void * returns){
                 if (json_object_is_type(json_object_array_get_idx(val, 0), json_type_string)){
                     char (*ptr)[256]=(char (*)[256])returns;
 
-                    for (int i = 0; i < json_object_array_length(val); ++i) {
+                    for (int i = 0; i < (int)json_object_array_length(val); ++i) {
                         char *p = ptr[i];
                         struct json_object *a = json_object_array_get_idx(val, i);
                         snprintf(p,256,"%s",json_object_get_string(a));
@@ -270,21 +270,21 @@ struct json_object * parseJson(char buf[],char search[],void * returns){
                 }else if (json_object_is_type(json_object_array_get_idx(val, 0), json_type_int)){
                     int *ptr=(int *)returns;
 
-                    for (int i = 0; i < json_object_array_length(val); ++i) {
+                    for (int i = 0; i < (int)json_object_array_length(val); ++i) {
                         struct json_object *a = json_object_array_get_idx(val, i);
                         ptr[i]=json_object_get_int(a);
                     }
                 }else if (json_object_is_type(json_object_array_get_idx(val, 0), json_type_double)){
                     double *ptr=(double *)returns;
 
-                    for (int i = 0; i < json_object_array_length(val); ++i) {
+                    for (int i = 0; i < (int)json_object_array_length(val); ++i) {
                         struct json_object *a = json_object_array_get_idx(val, i);
                         ptr[i]=json_object_get_double(a);
                     }
                 }else if (json_object_is_type(json_object_array_get_idx(val, 0), json_type_boolean)){
                     bool *ptr=(bool *)returns;
 
-                    for (int i = 0; i < json_object_array_length(val); ++i) {
+                    for (int i = 0; i < (int)json_object_array_length(val); ++i) {
                         struct json_object *a = json_object_array_get_idx(val, i);
                         ptr[i]=json_object_get_boolean(a)? true:false;
                     }
@@ -292,7 +292,7 @@ struct json_object * parseJson(char buf[],char search[],void * returns){
                 }else{
                     char (*ptr)[1024]=(char (*)[1024])returns;
 
-                    for (int i = 0; i < json_object_array_length(val); ++i) {
+                    for (int i = 0; i < (int)json_object_array_length(val); ++i) {
                         char *p = ptr[i];
                         struct json_object *a = json_object_array_get_idx(val, i);
                         snprintf(p,1024,"%s",json_object_get_string(a));

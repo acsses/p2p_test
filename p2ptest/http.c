@@ -30,7 +30,6 @@ int requestHttpGET(char buff[], int buf_size,char * URL,int is_local) {
 
     // IPアドレスの解決
     struct addrinfo hints, *res;
-    struct in_addr addr;
     int err;
     long long before;
     long long after;
@@ -39,9 +38,7 @@ int requestHttpGET(char buff[], int buf_size,char * URL,int is_local) {
     char *send_buf;
     send_buf=(char *)malloc(BUF_LEN);
 
-    struct URL url = {
-        "css-eblog.com", "/", 80
-    };
+    struct URL url = {};
 
     parseURL(URL,&url);
 
@@ -140,7 +137,6 @@ int requestHttpsGET(char buff[], int buf_size,char * URL) {
     int sock;
 
     struct addrinfo hints, *res;
-    struct sockaddr_in addr;
     int err;
 
     SSL *ssl;
@@ -149,9 +145,7 @@ int requestHttpsGET(char buff[], int buf_size,char * URL) {
     long long before;
     long long after;
 
-    Url url = {
-        "css-eblog.com", "/", 80
-    };
+    Url url = {};
 
     parseURL(URL, &url);
 
@@ -248,7 +242,6 @@ int requestHttpPOST(char buff[], int buf_size,char * URL,int is_local,char heade
     int sock;
 
     struct addrinfo hints, *res;
-    struct sockaddr_in addr;
     int err;
 
     long long before;
@@ -256,11 +249,8 @@ int requestHttpPOST(char buff[], int buf_size,char * URL,int is_local,char heade
 
     char send_buf[BUF_LEN];
 
-    Url url = {
-        "css-eblog.com", "/", 80
-    };
+    Url url = {};
 
-    char *error = NULL;
     parseURL(URL, &url);
 
     if(is_local==1){
@@ -364,7 +354,6 @@ int requestHttpsPOST(char buff[], int buf_size,char * URL,char header[],char bod
     int sock;
 
     struct addrinfo hints, *res;
-    struct sockaddr_in addr;
     int err;
 
     SSL *ssl;
@@ -373,11 +362,7 @@ int requestHttpsPOST(char buff[], int buf_size,char * URL,char header[],char bod
     long long before;
     long long after;
 
-    Url url = {
-        "css-eblog.com", "/", 80
-    };
-
-    char *error = NULL;
+    Url url = {};
 
     parseURL(URL, &url);
 

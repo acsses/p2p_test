@@ -14,7 +14,7 @@
     #include <net/if_dl.h>
     #include <net/if_types.h>
 
-#elif defined(__linux__)
+#elif defined(linux)
 
     #define  MAX_IFS 20
 

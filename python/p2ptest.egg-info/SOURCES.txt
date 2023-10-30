@@ -1,9 +1,0 @@
-setup.py
-../p2ptest/http.c
-../p2ptest/parser.c
-../p2ptest/timeutil.c
-p2ptest.egg-info/PKG-INFO
-p2ptest.egg-info/SOURCES.txt
-p2ptest.egg-info/dependency_links.txt
-p2ptest.egg-info/top_level.txt
-src/pyhttp.c

@@ -20,6 +20,7 @@ int messageReqNodeList(char disc_server_list[][256],int status,struct json_objec
 int main(){
     short int ex_port=3600;
     char buf[2048];
+    unsigned char gip[4];
     int statuscode;
 
     int status;
@@ -34,9 +35,9 @@ int main(){
         return 1;
     }
 
-    if((status=UpnpPortmapping(ex_port))<0){
+    if((status=UpnpPortmapping(ex_port,gip))<0){
 
-        if ((status=NatpmpPortmapping(ex_port))!=0){
+        if ((status=NatpmpPortmapping(ex_port,gip))!=0){
             statuscode = CONNECTION_NOT_PORTMAPPPED;
             char ns[40][256]={};
             struct json_object *obj;

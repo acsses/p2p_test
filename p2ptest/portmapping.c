@@ -8,7 +8,7 @@
 
 #include "include/portmapping.h"
 
-int UpnpPortmapping(unsigned int ex_port){
+int UpnpPortmapping(unsigned int ex_port,unsigned char gip[]){
     char *buf;
     char *servicetype;
     char *selfip;
@@ -22,6 +22,11 @@ int UpnpPortmapping(unsigned int ex_port){
     res = (Http*)malloc(sizeof(Http));
 
     if(ssdpMsearch(buf,2048)==-1){
+        free(buf);
+        free(servicetype);
+        free(selfip);
+        free(ssdp);
+        free(res);
         printf("not found root device\n");
         return -1;
     };
@@ -29,6 +34,11 @@ int UpnpPortmapping(unsigned int ex_port){
 
     parseSsdp(buf,ssdp);
     if(strlen(ssdp->Location)==0){
+        free(buf);
+        free(servicetype);
+        free(selfip);
+        free(ssdp);
+        free(res);
         printf("not found doc url\n");
         return -2;
     }
@@ -40,6 +50,11 @@ int UpnpPortmapping(unsigned int ex_port){
     parseHttp(buf,res);
 
     if(strlen(res->Body)==0){
+        free(buf);
+        free(servicetype);
+        free(selfip);
+        free(ssdp);
+        free(res);
         printf("failed to get document\r\n");
         return -3;
     }
@@ -50,7 +65,6 @@ int UpnpPortmapping(unsigned int ex_port){
     if(strstr(servicetype,"urn:schemas-upnp-org:service:WANIPConnection:1")){
         char controlurl[256];
         Url url;
-        char *error = NULL;
         char sendurl[256];
         Http *res_2;
         res_2=(Http*)malloc(sizeof(Http));
@@ -68,8 +82,54 @@ int UpnpPortmapping(unsigned int ex_port){
                 "http://%s:%d/%s",url.host,url.port,controlurl
             );
         }
+        char *body;
+        char *header;
 
-        char body[2048];
+        body = (char*)malloc(2048);
+        header = (char*)malloc(1024);
+
+        char *gip_;
+        gip_ = (char *)malloc(32);
+        snprintf(body, sizeof(body),
+            "<?xml version='1.0'?>\r\n"
+            "<s:Envelope xmlns:s='http://schemas.xmlsoap.org/soap/envelope/' s:encodingStyle='http://schemas.xmlsoap.org/soap/encoding/'>\r\n"
+            "<s:Body>\r\n"   
+            "<u:GetExternalIPAddress xmlns:u='urn:schemas-upnp-org:service:WANIPConnection:1'></u:GetExternalIPAddress>\r\n"
+            "</s:Body>\r\n"
+            "</s:Envelope>\r\n"
+        );
+        snprintf(header, sizeof(header),
+            "Content-Type: text/xml\r\n"
+            "Content-Length: %lu\r\n"
+            "SOAPACTION: urn:schemas-upnp-org:service:WANIPConnection:1#GetExternalIPAddress\r\n",              // HEADER
+            strlen(body)
+        );
+
+        requestHttpPOST(buf,2048,sendurl,1,header,body);
+        parseHttp(buf,res_2);
+        parseXML(res_2,gip_,"NewExternalIPAddress");
+
+        int i=0;
+        int j=0;
+        int start=0;
+
+        for(i=0;i<(int)strlen(gip_);++i){
+            if(gip_[i]=='.'){
+                char *l;
+                l=(char *)malloc(i-start);
+                snprintf(l,i-start+1,"%s",gip_+start);
+                gip[j]=(unsigned char)atoi(l);
+                free(l);
+                ++j;
+            }
+        }
+        free(gip_);
+
+        memset(buf, '\0', 2048);
+        memset(body,'\0',sizeof(body));
+        memset(header,'\0',sizeof(header));
+        memset(res_2,'\0',sizeof(res_2));
+
         snprintf(body, sizeof(body),
             "<?xml version='1.0'?>\r\n"
             "<s:Envelope xmlns:s='http://schemas.xmlsoap.org/soap/envelope/' s:encodingStyle='http://schemas.xmlsoap.org/soap/encoding/'>\r\n"
@@ -88,7 +148,6 @@ int UpnpPortmapping(unsigned int ex_port){
             ex_port, "tcp",selfip
         );
         free(selfip);
-        char header[1024];
         snprintf(header, sizeof(header),
             "Content-Type: text/xml\r\n"
             "Content-Length: %lu\r\n"
@@ -100,14 +159,23 @@ int UpnpPortmapping(unsigned int ex_port){
         parseHttp(buf,res_2);
         parseXML(res_2,succsess,"serviceType");
         if(strlen(succsess)==0){
+            free(buf);
+            free(servicetype);
+            free(ssdp);
+            free(body);
+            free(header);
+            free(res);
+            free(res_2);
             printf("failed to port open with WANIPConfig");
             return -1;
         }
+        free(body);
+        free(header);
         free(servicetype);
+        free(res_2);
     }else if (strstr(servicetype,"urn:schemas-upnp-org:service:WANPPPConnection:1")){
         char controlurl[256];
         Url url;
-        char *error = NULL;
         char sendurl[256];
         Http *res_2;
         res_2=(Http*)malloc(sizeof(Http));
@@ -126,7 +194,55 @@ int UpnpPortmapping(unsigned int ex_port){
             );
         }
 
-        char body[2048];
+        char *body;
+        char *header;
+
+        body = (char*)malloc(2048);
+        header = (char*)malloc(1024);
+
+        char *gip_;
+        gip_ = (char *)malloc(32);
+
+        snprintf(body, sizeof(body),
+            "<?xml version='1.0'?>\r\n"
+            "<s:Envelope xmlns:s='http://schemas.xmlsoap.org/soap/envelope/' s:encodingStyle='http://schemas.xmlsoap.org/soap/encoding/'>\r\n"
+            "<s:Body>\r\n"   
+            "<u:GetExternalIPAddress xmlns:u='urn:schemas-upnp-org:service:WANPPPConnection:1'></u:GetExternalIPAddress>\r\n"
+            "</s:Body>\r\n"
+            "</s:Envelope>\r\n"
+        );
+        snprintf(header, sizeof(header),
+            "Content-Type: text/xml\r\n"
+            "Content-Length: %lu\r\n"
+            "SOAPACTION: urn:schemas-upnp-org:service:WANPPPConnection:1#GetExternalIPAddress\r\n",              // HEADER
+            strlen(body)
+        );
+
+        requestHttpPOST(buf,2048,sendurl,1,header,body);
+        parseHttp(buf,res_2);
+        parseXML(res_2,gip_,"NewExternalIPAddress");
+
+        int i=0;
+        int j=0;
+        int start=0;
+
+        for(i=0;i<(int)strlen(gip_);++i){
+            if(gip_[i]=='.'){
+                char *l;
+                l=(char *)malloc(i-start);
+                snprintf(l,i-start+1,"%s",gip_+start);
+                gip[j]=(unsigned char)atoi(l);
+                free(l);
+                ++j;
+            }
+        }
+        free(gip_);
+        
+        memset(buf, '\0', 2048);
+        memset(body,'\0',sizeof(body));
+        memset(header,'\0',sizeof(header));
+        memset(res_2,'\0',sizeof(res_2));
+
         snprintf(body, sizeof(body),
             "<?xml version='1.0'?>\r\n"
             "<s:Envelope xmlns:s='http://schemas.xmlsoap.org/soap/envelope/' s:encodingStyle='http://schemas.xmlsoap.org/soap/encoding/'>\r\n"
@@ -145,7 +261,6 @@ int UpnpPortmapping(unsigned int ex_port){
             ex_port, "tcp",selfip
         );
         free(selfip);
-        char header[1024];
         snprintf(header, sizeof(header),
             "Content-Type: text/xml\r\n"
             "Content-Length: %lu\r\n"
@@ -157,24 +272,40 @@ int UpnpPortmapping(unsigned int ex_port){
         parseHttp(buf,res_2);
         parseXML(res_2,succsess,"serviceType");
         if(strlen(succsess)==0){
+            free(buf);
+            free(servicetype);
+            free(ssdp);
+            free(body);
+            free(header);
+            free(res);
+            free(res_2);
             printf("failed to port open with WANPPPConfig");
             return -1;
         }
-    free(servicetype);
+        free(body);
+        free(header);
+        free(servicetype);
+        free(res_2);
     }else{
         free(buf);
         free(servicetype);
         free(selfip);
+        free(ssdp);
+        free(res);
         printf("serviceType is not Compatible\n");
         return -1;
     }
     free(buf);
+    free(servicetype);
+    free(selfip);
+    free(ssdp);
+    free(res);
     
     return 1;
     
 }
 
-int NatpmpPortmapping(unsigned int ex_port){
+int NatpmpPortmapping(unsigned int ex_port,unsigned char gip[]){
     int ip;
     int subnet;
     int target_int;
@@ -219,6 +350,10 @@ int NatpmpPortmapping(unsigned int ex_port){
             free(buf);
             free(natpmp);
             printf("successed port mapping!");
+            gip[0]=buf[8];
+            gip[1]=buf[9];
+            gip[2]=buf[10];
+            gip[3]=buf[11];
             return 0;
         }
     }

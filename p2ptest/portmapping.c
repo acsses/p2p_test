@@ -8,6 +8,8 @@
 
 #include "include/portmapping.h"
 
+#define DEV_MODE 1
+
 int UpnpPortmapping(unsigned int ex_port,unsigned char gip[]){
     char *buf;
     char *servicetype;
@@ -333,27 +335,36 @@ int NatpmpPortmapping(unsigned int ex_port,unsigned char gip[]){
     );
 
     if((status=requestNatpmp(buf,target,-1,-1,-1))>=0){
-        if(buf[8]==192){
-            free(buf);
-            free(natpmp);
-            printf("I'm in double nat situation\n");
-            return -1;
+        if(DEV_MODE){
+            gip[0]=buf[8];
+            gip[1]=buf[9];
+            gip[2]=buf[10];
+            gip[3]=buf[11];
+        }else{
+            if(buf[8]==192){
+                free(buf);
+                free(natpmp);
+                printf("I'm in double nat situation\n");
+                return -1;
+            }else{
+                gip[0]=buf[8];
+                gip[1]=buf[9];
+                gip[2]=buf[10];
+                gip[3]=buf[11];
+            }
         }
     }else{
         free(buf);
         free(natpmp);
         return -1;
     }
+    memset(buf,0,sizeof(buf));
     if((status=requestNatpmp(buf,target,ex_port ,ex_port,60))>=0){
         parseNatpmp(buf,natpmp);
         if(natpmp->ResultCode==0){
             free(buf);
             free(natpmp);
-            printf("successed port mapping!");
-            gip[0]=buf[8];
-            gip[1]=buf[9];
-            gip[2]=buf[10];
-            gip[3]=buf[11];
+            printf("successed port mapping!\n");
             return 0;
         }
     }

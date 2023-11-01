@@ -55,6 +55,12 @@ int main(){
                 messageReqNodeList(ds,statuscode,obj,fp);
             }
         }else{
+            printf("%d.%d.%d.%d\n",
+                gip[0],
+                gip[1],
+                gip[2],
+                gip[3]
+            );
             printf("broadcast my adderss\n");
             printf("set ttl timer\n");
         }

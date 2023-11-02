@@ -13,7 +13,6 @@
 
 #include "include/timeutil.h"
 #include "include/parser.h"
-#define BUF_LEN 256
 
 #include  "include/ssdp.h"
 
@@ -21,12 +20,7 @@ int ssdpMsearch(char buf[],int buf_size){
     int sock;
     struct sockaddr_in addr;
     struct sockaddr_in local_addr;
-    struct sockaddr_in from_addr;
-    socklen_t sin_size;
-    int status;
-    bool yes = 1;
     int flags = 0;
-    struct timeval tv;
     long long before;
     long long after;
     int d;

@@ -1,15 +1,13 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/ioctl.h>
-#include <netinet/in.h>
+#include <stdio.h> //printf,snprintf,
+#include <string.h> //strerror
+#include <stdlib.h> //malloc
+#include <sys/types.h> 
+#include <sys/socket.h> //socket,connect
+#include <sys/ioctl.h> //ioctl
+#include <netinet/in.h> //struct sockaddr_in
 #include <arpa/inet.h>
-#include <unistd.h>  
-#include <stdbool.h>
-#include <errno.h>
-#include <sys/time.h> 
+#include <unistd.h>//close
+#include <errno.h> //errno
 
 #include "include/timeutil.h"
 #include "include/parser.h"
@@ -36,7 +34,8 @@ int ssdpMsearch(char buf[],int buf_size){
     local_addr.sin_port = htons(5008);
     local_addr.sin_addr.s_addr = INADDR_ANY;
 
-    char msearch[2048] = {};
+    char *msearch;
+    msearch=(char*)malloc(1024);
     snprintf(msearch, sizeof(msearch),
         "%s"
         "HOST:%s:%d\r\n"
@@ -60,6 +59,7 @@ int ssdpMsearch(char buf[],int buf_size){
     if(sendto(sock, msearch, sizeof(msearch), 0, (struct sockaddr *)&addr, sizeof(addr))==-1){
         printf("send msearch error:%s\r\n",strerror(errno));
     }
+    free(msearch);
 
     before = gettime();
     while (flags==0){

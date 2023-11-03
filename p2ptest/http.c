@@ -1,18 +1,15 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/ioctl.h>
-#include <netdb.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <sys/param.h>
-#include <unistd.h>
-#include <errno.h>
-#include <stdlib.h>
-#include <netinet/in.h>
-#include <net/if.h>
+#include <stdio.h> //printf,sprintf
+#include <string.h> //memset,strcat
+#include <stdlib.h> //malloc
+#include <sys/types.h> //struct addrinfo
+#include <sys/socket.h> //socket,connect
+#include <sys/ioctl.h> //ioctl
+#include <netdb.h> //getaddrinfo,
+#include <netinet/in.h> //struct sockaddr_in
+#include <arpa/inet.h> //<------------------------------------------
+#include <unistd.h> //close
+#include <errno.h> //errno
+#include <net/if.h> //<------------------------------------------
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 
@@ -38,7 +35,7 @@ int requestHttpGET(char buff[], int buf_size,char * URL,int is_local) {
     char *send_buf;
     send_buf=(char *)malloc(BUF_LEN);
 
-    struct URL url = {};
+    Url url = {};
 
     parseURL(URL,&url);
 
@@ -247,7 +244,8 @@ int requestHttpPOST(char buff[], int buf_size,char * URL,int is_local,char heade
     long long before;
     long long after;
 
-    char send_buf[BUF_LEN];
+    char *send_buf;
+    send_buf=(char *)malloc(BUF_LEN);
 
     Url url = {};
 
@@ -315,6 +313,8 @@ int requestHttpPOST(char buff[], int buf_size,char * URL,int is_local,char heade
         sprintf(send_buf, "%s", body);
         write(sock, send_buf, strlen(send_buf));
     }
+
+    free(send_buf);
 
     before = gettime();
 

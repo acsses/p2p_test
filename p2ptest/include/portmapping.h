@@ -10,9 +10,9 @@
     
     
 /*--   prototype declaration    --*/
-int UpnpPortmapping(unsigned int ex_port);
+int UpnpPortmapping(unsigned int ex_port,unsigned char gip[]);
 
-int NatpmpPortmapping(unsigned int ex_port);
+int NatpmpPortmapping(unsigned int ex_port,unsigned char buf[]);
 /*--   prototype declaration    --*/
 
 

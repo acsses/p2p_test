@@ -1,1 +1,0 @@
-{ "discvoery_server": [ "discover-server.vercel.app" ], "node": [ { "id": "test", "address": "test", "status": 0 } ] }

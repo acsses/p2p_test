@@ -1,4 +1,4 @@
-#include <string.h>
+#include <string.h> //strcat
 #include <openssl/sha.h>
 #include <openssl/evp.h>
 #include <openssl/conf.h>

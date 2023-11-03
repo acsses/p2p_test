@@ -15,11 +15,14 @@
 #define DEV_MODE 0
 
 
-int messageReqNodeList(char disc_server_list[][256],int status,struct json_object *obj,FILE* f);
+int messageReqNodeList(char disc_server_list[][256],int status,char address[],struct json_object *obj,FILE* f);
+
+int messageBroCasAddr(char disc_server_list[][256],char node_list[][256],char addr[],int status);
 
 int main(){
     short int ex_port=3600;
     char buf[2048];
+    unsigned char gip[4];
     int statuscode;
 
     int status;
@@ -34,9 +37,9 @@ int main(){
         return 1;
     }
 
-    if((status=UpnpPortmapping(ex_port))<0){
+    if((status=UpnpPortmapping(ex_port,gip))<0){
 
-        if ((status=NatpmpPortmapping(ex_port))!=0){
+        if ((status=NatpmpPortmapping(ex_port,gip))!=0){
             statuscode = CONNECTION_NOT_PORTMAPPPED;
             char ns[40][256]={};
             struct json_object *obj;
@@ -51,9 +54,35 @@ int main(){
             if(c==0){
                 char ds[10][256]={};
                 parseJson(buf,"discvoery_server",&ds);
-                messageReqNodeList(ds,statuscode,obj,fp);
+                messageReqNodeList(ds,statuscode,NULL,obj,fp);
             }
         }else{
+            statuscode = CONNECTION_PORTMAPPED;
+            char addr[32];
+            snprintf(addr,sizeof(addr),
+                "%d.%d.%d.%d:%d",
+                gip[0],
+                gip[1],
+                gip[2],
+                gip[3],
+                ex_port
+            );
+            char ns[40][256]={};
+            char ds[10][256]={};
+            struct json_object *obj;
+            obj = parseJson(buf,"node",&ns);
+            parseJson(buf,"discvoery_server",&ds);
+            int c=0;
+            while(1){
+                if(ns[c][0]=='\0'){
+                    break;
+                }
+                ++c;
+            }
+            if(c==0){
+                messageReqNodeList(ds,statuscode,addr,obj,fp);
+            }
+            messageBroCasAddr(ds,ns,addr,statuscode);
             printf("broadcast my adderss\n");
             printf("set ttl timer\n");
         }
@@ -62,9 +91,10 @@ int main(){
     }
 }
 
-int messageReqNodeList(char disc_server_list[][256],int status,struct json_object *obj,FILE* f){
+int messageReqNodeList(char disc_server_list[][256],int status,char address[],struct json_object *obj,FILE* f){
     int d=0;
     int i=0;
+    printf("%s\n",address);
     while(d==0){
         d=(disc_server_list[i][0]=='\0');
         if(d==1){
@@ -86,14 +116,27 @@ int messageReqNodeList(char disc_server_list[][256],int status,struct json_objec
 
         Http *res;
         res = (Http*)malloc(sizeof(Http));
-        snprintf(content,2048,
-            "{"
-            "\"id\":\"%s\","
-            "\"type\":\"reqlist\","
-            "\"status\":\"%d\""
-            "}",
-            id,status
-        );
+        if(address!=NULL){
+            snprintf(content,2048,
+                "{"
+                "\"id\":\"%s\","
+                "\"address\":\"%s\","
+                "\"type\":\"reqlist\","
+                "\"status\":\"%d\""
+                "}",
+                id,address,status
+            );
+        }else{
+            snprintf(content,2048,
+                "{"
+                "\"id\":\"%s\","
+                "\"type\":\"reqlist\","
+                "\"status\":\"%d\""
+                "}",
+                id,status
+            );
+        }
+
 
         if(DEV_MODE){
             snprintf(url,256,"http://%s/api/nodes",disc_server_list[i]);
@@ -125,8 +168,8 @@ int messageReqNodeList(char disc_server_list[][256],int status,struct json_objec
         if(strlen(res->Body)==0){
             return -1;
         }
-        f = fopen("table.json", "w"); 
         parseJson(res->Body,"result",&nodes);
+        f = fopen("table.json", "w"); 
         int j=0;
         int k=0;
         json_object *nodes_json = json_object_new_array();
@@ -150,3 +193,25 @@ int messageReqNodeList(char disc_server_list[][256],int status,struct json_objec
     
     return 0;
 };
+
+int messageBroCasAddr(char disc_server_list[][256],char node_list[][256],char addr[],int status){
+    printf("%s\n",addr);
+
+    int c=0;
+    while(1){
+        if(disc_server_list[c][0]=='\0'){
+            break;
+        }
+        printf("%s\n",disc_server_list[c]);
+        ++c;
+    }
+    c=0;
+    while(1){
+        if(node_list[c][0]=='\0'){
+            break;
+        }
+        printf("%s\n",node_list[c]);
+        ++c;
+    }
+
+}

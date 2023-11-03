@@ -35,7 +35,9 @@ int parseSsdp(char target[],struct ssdp *ssdp){
 
     for(i=0;i<(int)strlen(target);++i){
         if(target[i]=='\r'){
-            char l[i-start];
+            char *l;
+            l=(char*)malloc(i-start);
+
             snprintf(l,i-start+1,"%s",target+start);
             int j=0;
             int colon=0;
@@ -66,6 +68,7 @@ int parseSsdp(char target[],struct ssdp *ssdp){
                     break;
                 }
             }
+            free(l);
             start=i+2;
         }
 
@@ -81,7 +84,8 @@ int parseHttp(char response[],Http *http){
     
     for (n=0;n<(int)strlen(response);++n){
         if(response[n]=='\r'){
-            char l[n-start];
+            char *l;
+            l=(char*)malloc(n-start);
             snprintf(l,n-start+1,"%s",response+start);
             int j=0;
             int colon=0;
@@ -103,6 +107,7 @@ int parseHttp(char response[],Http *http){
                 ++i;
             }
             start=n+1;
+            free(l);
         }
     }
     

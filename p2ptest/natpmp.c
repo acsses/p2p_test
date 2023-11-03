@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -17,10 +16,7 @@ int requestNatpmp(unsigned char buf[],char addres[],short int ex_port, short int
     int sock;
     struct sockaddr_in addr;
     struct sockaddr_in local_addr;
-    struct sockaddr_in from_addr;
-    socklen_t sin_size;
     char *message;
-    char globalip[16];
     int size;
     long long before;
     long long after;

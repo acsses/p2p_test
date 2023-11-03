@@ -1,12 +1,8 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/types.h>
+#include <stdio.h> //printf,sprintf
+#include <stdlib.h> //malloc
+#include <string.h> //memcpy
 #include <sys/socket.h>
 #include <net/if.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <unistd.h>  
-#include <sys/ioctl.h>
 
 #if defined(__APPLE__)
 
@@ -15,6 +11,9 @@
     #include <net/if_types.h>
 
 #elif defined(linux)
+
+    #include <sys/ioctl.h>
+    #include <netinet/in.h>
 
     #define  MAX_IFS 20
 
@@ -31,8 +30,11 @@ int getid(char buf[]){
     struct ifaddrs *ifa_list, *ifa; 
     struct sockaddr_dl *dl;
     unsigned char *addr;
-    char name[12];
-    unsigned char src_[128];
+    unsigned char *src_;
+
+    src_=(unsigned char*)malloc(128);
+
+
     if (getifaddrs(&ifa_list) < 0) {
         return 1;
     }
@@ -42,6 +44,8 @@ int getid(char buf[]){
         dl = (struct sockaddr_dl*)ifa->ifa_addr; 
 
         if (dl->sdl_family == AF_LINK && dl->sdl_type == IFT_ETHER) {
+            char *name;
+            name=(char *)malloc(12);
             memcpy(name, dl->sdl_data, dl->sdl_nlen);
             name[dl->sdl_nlen] = '\0';
             unsigned char *buf;
@@ -51,6 +55,7 @@ int getid(char buf[]){
                 src_[j*6+1+i]=buf[i];
             }
             free(buf);
+            free(name);
             ++j;
         }
     } 
@@ -60,6 +65,7 @@ int getid(char buf[]){
         src[l]=src_[l];
     }
     sha256hex(src,sizeof(src),buf);
+    free(src_);
     return 0;
 }
 

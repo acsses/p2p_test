@@ -1,12 +1,12 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
+#include <stdio.h> //printf
+#include <string.h> //memset
+#include <stdlib.h> //malloc
 #include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/ioctl.h>
-#include <netdb.h>
+#include <sys/socket.h> //socket
+#include <sys/ioctl.h> //ioctl
+#include <netdb.h> //<-------------------------------------
 #include <netinet/in.h>
-#include <netinet/if_ether.h>
+#include <netinet/if_ether.h> //IFT_ETHER
 #include <netinet/ip.h>
 #include <net/if_arp.h> 
 #include <net/if.h>
@@ -80,13 +80,16 @@ int getmacaddr(char ifname[],unsigned char buf[]){
   struct ifaddrs *ifa_list, *ifa; 
   struct sockaddr_dl *dl; 
   unsigned char *addr;
-  char name[12];
+
+
   if (getifaddrs(&ifa_list) < 0) {
       return 1;
   }
   for (ifa = ifa_list; ifa != NULL; ifa = ifa->ifa_next) { 
       dl = (struct sockaddr_dl*)ifa->ifa_addr; 
       if (dl->sdl_family == AF_LINK && dl->sdl_type == IFT_ETHER) {
+          char *name;
+          name=(char*)malloc(12);
           memcpy(name, dl->sdl_data, dl->sdl_nlen);
           name[dl->sdl_nlen] = '\0';
           if(strcmp(name,ifname)==0){
@@ -97,8 +100,8 @@ int getmacaddr(char ifname[],unsigned char buf[]){
             buf[3] = addr[3];
             buf[4] = addr[4];
             buf[5] = addr[5];
-
           }
+          free(name);
       }
   } 
   freeifaddrs(ifa_list); 

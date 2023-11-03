@@ -1,6 +1,0 @@
-request
-.vscode/
-python/build/
-python/dist/
-python/p2ptest.egg-info/
-table.json

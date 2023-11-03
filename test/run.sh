@@ -1,1 +1,0 @@
-gcc test.c ../p2ptest/portmapping.c

@@ -322,11 +322,12 @@ int NatpmpPortmapping(unsigned int ex_port,unsigned char gip[]){
     
     ip = getselfip();
     subnet = getselfsubnet();
+
     target_int = ip & subnet;
 
     target_int = target_int + (1<<24);
 
-    snprintf(target, sizeof(target),
+    snprintf(target, 256,
         "%d.%d.%d.%d",
         (target_int>>0)&0xFF,
         (target_int>>8)&0xFF,

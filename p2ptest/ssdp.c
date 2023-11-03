@@ -31,12 +31,12 @@ int ssdpMsearch(char buf[],int buf_size){
     addr.sin_addr.s_addr = inet_addr("239.255.255.250");
 
     local_addr.sin_family = AF_INET;
-    local_addr.sin_port = htons(5008);
+    local_addr.sin_port = htons(1900);
     local_addr.sin_addr.s_addr = INADDR_ANY;
 
     char *msearch;
     msearch=(char*)malloc(1024);
-    snprintf(msearch, sizeof(msearch),
+    snprintf(msearch, 1024,
         "%s"
         "HOST:%s:%d\r\n"
         "MAN:\"ssdp:discover\"\r\n"
@@ -56,7 +56,7 @@ int ssdpMsearch(char buf[],int buf_size){
     u_long val=1;
     ioctl(sock, FIONBIO, &val);
 
-    if(sendto(sock, msearch, sizeof(msearch), 0, (struct sockaddr *)&addr, sizeof(addr))==-1){
+    if(sendto(sock, msearch, 1024, 0, (struct sockaddr *)&addr, sizeof(addr))==-1){
         printf("send msearch error:%s\r\n",strerror(errno));
     }
     free(msearch);

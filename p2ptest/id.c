@@ -1,12 +1,8 @@
 #include <stdio.h> //printf,sprintf
 #include <stdlib.h> //malloc
-#include <sys/types.h> 
+#include <string.h> //memcpy
 #include <sys/socket.h>
 #include <net/if.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <unistd.h>  //<---------------------------
-#include <sys/ioctl.h> //<---------------------------
 
 #if defined(__APPLE__)
 
@@ -15,6 +11,9 @@
     #include <net/if_types.h>
 
 #elif defined(linux)
+
+    #include <sys/ioctl.h>
+    #include <netinet/in.h>
 
     #define  MAX_IFS 20
 

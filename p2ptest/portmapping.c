@@ -313,15 +313,18 @@ int NatpmpPortmapping(unsigned int ex_port,unsigned char gip[]){
     int target_int;
     int status;
     char *target;
+    char *ifname;
     unsigned char *buf;
     Natpmp *natpmp;
 
     buf = (unsigned char*)malloc(2048);
     target = (char *)malloc(256);
     natpmp = (Natpmp*)malloc(sizeof(Natpmp));
-    
-    ip = getselfip();
-    subnet = getselfsubnet();
+    ifname = (char *)malloc(128);
+
+    getifname(0,ifname);
+    ip = getselfip(ifname);
+    subnet = getselfsubnet(ifname);
 
     target_int = ip & subnet;
 
@@ -334,6 +337,8 @@ int NatpmpPortmapping(unsigned int ex_port,unsigned char gip[]){
         (target_int>>16)&0xFF,
         (target_int>>24)&0xFF
     );
+
+    printf("%s\n",target);
 
     if((status=requestNatpmp(buf,target,-1,-1,-1))>=0){
         if(DEV_MODE){

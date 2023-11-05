@@ -15,6 +15,7 @@
 
 #include "include/parser.h"
 #include "include/timeutil.h"
+#include "include/network.h"
 
 #include "include/http.h"
 
@@ -50,6 +51,17 @@ int requestHttpGET(char buff[], int buf_size,char * URL,int is_local) {
             printf("socket create error\n");
             return 1;
         }
+        char *ifname;
+        ifname = (char*)malloc(128);
+        getifname(0,ifname);
+        int idx = if_nametoindex(ifname);
+
+
+        if(setsockopt(sock, IPPROTO_IP, IP_BOUND_IF, &idx, sizeof(idx))!=0){
+            printf("set sock opt error\n");
+        };
+        free(ifname);
+
 
         // サーバに接続
         if (connect(sock, (struct sockaddr*)&addrs, sizeof(struct sockaddr_in)) != 0) {
@@ -75,6 +87,17 @@ int requestHttpGET(char buff[], int buf_size,char * URL,int is_local) {
             printf("socket create error\n");
             return 1;
         }
+
+        char *ifname;
+        ifname = (char*)malloc(128);
+        getifname(0,ifname);
+        int idx = if_nametoindex(ifname);
+
+
+        if(setsockopt(sock, IPPROTO_IP, IP_BOUND_IF, &idx, sizeof(idx))!=0){
+            printf("set sock opt error\n");
+        };
+        free(ifname);
 
         // サーバに接続
         if (connect(sock, res->ai_addr, res->ai_addrlen) != 0) {
@@ -167,6 +190,17 @@ int requestHttpsGET(char buff[], int buf_size,char * URL) {
         printf("socket set error\n");
         return -1;
     }
+
+    char *ifname;
+    ifname = (char*)malloc(128);
+    getifname(0,ifname);
+    int idx = if_nametoindex(ifname);
+
+
+    if(setsockopt(sock, IPPROTO_IP, IP_BOUND_IF, &idx, sizeof(idx))!=0){
+        printf("set sock opt error\n");
+    };
+    free(ifname);
     
 
     if (connect(sock, res->ai_addr, res->ai_addrlen) < 0){
@@ -263,6 +297,17 @@ int requestHttpPOST(char buff[], int buf_size,char * URL,int is_local,char heade
             return 1;
         }
 
+        char *ifname;
+        ifname = (char*)malloc(128);
+        getifname(0,ifname);
+        int idx = if_nametoindex(ifname);
+
+
+        if(setsockopt(sock, IPPROTO_IP, IP_BOUND_IF, &idx, sizeof(idx))!=0){
+            printf("set sock opt error\n");
+        };
+        free(ifname);
+
         // サーバに接続
         if (connect(sock, (struct sockaddr*)&addrs, sizeof(struct sockaddr_in)) != 0) {
             printf("connection error:%s\n",strerror(errno));
@@ -288,6 +333,17 @@ int requestHttpPOST(char buff[], int buf_size,char * URL,int is_local,char heade
             printf("socket create error:%s\n",strerror(errno));
             return 1;
         }
+
+        char *ifname;
+        ifname = (char*)malloc(128);
+        getifname(0,ifname);
+        int idx = if_nametoindex(ifname);
+
+
+        if(setsockopt(sock, IPPROTO_IP, IP_BOUND_IF, &idx, sizeof(idx))!=0){
+            printf("set sock opt error\n");
+        };
+        free(ifname);
 
         // サーバに接続
         if (connect(sock, res->ai_addr, res->ai_addrlen) != 0) {
@@ -388,6 +444,17 @@ int requestHttpsPOST(char buff[], int buf_size,char * URL,char header[],char bod
         printf("socket set error\n");
         return -1;
     }
+
+    char *ifname;
+    ifname = (char*)malloc(128);
+    getifname(0,ifname);
+    int idx = if_nametoindex(ifname);
+
+
+    if(setsockopt(sock, IPPROTO_IP, IP_BOUND_IF, &idx, sizeof(idx))!=0){
+        printf("set sock opt error\n");
+    };
+    free(ifname);
     
 
     if (connect(sock, res->ai_addr, res->ai_addrlen) < 0){

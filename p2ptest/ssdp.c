@@ -11,6 +11,7 @@
 
 #include "include/timeutil.h"
 #include "include/parser.h"
+#include "include/network.h"
 
 #include  "include/ssdp.h"
 
@@ -25,6 +26,17 @@ int ssdpMsearch(char buf[],int buf_size){
  
 
     sock = socket(AF_INET, SOCK_DGRAM, 0);
+
+    char *ifname;
+    ifname = (char*)malloc(128);
+    getifname(0,ifname);
+    int idx = if_nametoindex(ifname);
+
+
+    if(setsockopt(sock, IPPROTO_IP, IP_BOUND_IF, &idx, sizeof(idx))!=0){
+        printf("set sock opt error\n");
+    };
+    free(ifname);
 
     addr.sin_family = AF_INET;
     addr.sin_port = htons(1900);

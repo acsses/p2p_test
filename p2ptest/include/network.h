@@ -38,9 +38,11 @@
     
     
 /*--   prototype declaration    --*/
-int getselfip();
+int getselfip(char ifname[]);
 
-int getselfsubnet();
+int getselfsubnet(char ifname[]);
+
+int getifname(int idx,char ifname[]);
 
 int getmacaddr(char name[],unsigned char addr[]);
 /*--   prototype declaration    --*/

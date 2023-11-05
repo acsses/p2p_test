@@ -127,7 +127,7 @@ int getifname(int idx,char ifname[]){
             name[dl->sdl_nlen] = '\0';
             
             if(i==idx){
-                snprintf(ifname,strlen(name),"%s",name);
+                snprintf(ifname,strlen(name)+1,"%s",name);
             }
             free(name);
             ++i;
@@ -198,7 +198,7 @@ int getifname(int idx,char ifname[]){
 	    if (ifr->ifr_addr.sa_family == AF_INET) {
 	        strncpy(ifreq.ifr_name, ifr->ifr_name, sizeof(ifreq.ifr_name));
 	        if (i==idx) {
-	    	    snprintf(ifname,strlen(ifr->ifr_name),"%s",ifr->ifr_name);
+	    	    snprintf(ifname,strlen(ifr->ifr_name)+1,"%s",ifr->ifr_name);
 	        }
             ++i
 	    }

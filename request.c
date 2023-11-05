@@ -37,9 +37,12 @@ int main(){
         return 1;
     }
 
+    printf("starting port mapping by UPnP...\n");
     if((status=UpnpPortmapping(ex_port,gip))<0){
-
+        printf("port mapping by UPnP failed\n\n");
+         printf("starting port mapping by NAT-PMP...\n");
         if ((status=NatpmpPortmapping(ex_port,gip))!=0){
+            printf("port mapping by NAT-PMP failed\n\n");
             statuscode = CONNECTION_NOT_PORTMAPPPED;
             char ns[40][256]={};
             struct json_object *obj;

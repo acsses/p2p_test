@@ -323,6 +323,8 @@ int NatpmpPortmapping(unsigned int ex_port,unsigned char gip[]){
     ifname = (char *)malloc(128);
 
     getifname(0,ifname);
+
+    printf("%s\n",ifname);
     ip = getselfip(ifname);
     subnet = getselfsubnet(ifname);
 

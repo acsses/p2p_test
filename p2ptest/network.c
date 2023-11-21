@@ -25,7 +25,7 @@
 
 #endif
 
-#include "include/timeutil.h"
+#include "include/util.h"
 
 
 #include "include/network.h"

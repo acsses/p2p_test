@@ -23,6 +23,7 @@
 #include "include/sha256.h"
 
 #include "include/id.h"
+#include "include/util.h"
 
 #if defined(__APPLE__)
 
@@ -31,6 +32,7 @@ int getid(char buf[]){
     struct sockaddr_dl *dl;
     unsigned char *addr;
     unsigned char *src_;
+    char ifname_list[10][256];
 
     src_=(unsigned char*)malloc(128);
 
@@ -48,17 +50,21 @@ int getid(char buf[]){
             name=(char *)malloc(12);
             memcpy(name, dl->sdl_data, dl->sdl_nlen);
             name[dl->sdl_nlen] = '\0';
-            unsigned char *buf;
-            buf = (unsigned char *)malloc(6);
-            getmacaddr(name,buf);
-            for(int i=0;i<6;++i){
-                src_[j*6+1+i]=buf[i];
-            }
-            free(buf);
+            snprintf(ifname_list[j],256,"%s",name);
             free(name);
             ++j;
         }
     } 
+    sortchar(ifname_list, j-1);
+    for(int i=0;i<j;++i){
+        unsigned char *buf;
+        buf = (unsigned char *)malloc(6);
+        getmacaddr(ifname_list[i],buf);
+        for(int k=0;k<6;++k){
+            src_[i*6+1+k]=buf[k];
+        }
+        free(buf);
+    }
     freeifaddrs(ifa_list); 
     unsigned char src[j*6];
     for(int l=0;l<j*6+1;++l){
@@ -79,6 +85,7 @@ int getid(char buf[]){
     int sock;
     unsigned char *addr;
     unsigned char src_[6*MAX_IFS];
+    char ifname_list[10][256];
 
     sock = socket(AF_INET, SOCK_DGRAM, 0);
     ifc.ifc_len = sizeof(ifs);
@@ -95,15 +102,19 @@ int getid(char buf[]){
 	    	    return 1;
 	        }
             addr = ifreq.ifr_hwaddr.sa_data;
-            unsigned char *buf;
-            buf = (unsigned char *)malloc(6);
-            getmacaddr(ifreq.ifr_name,buf);
-            for(int i=0;i<6;++i){
-                src_[j*6+1+i]=buf[i];
-            }
-            free(buf);
+            snprintf(ifname_list[j],256,"%s",ifreq.ifr_name);
             ++j;
 	    }
+    }
+    sortchar(ifname_list, j-1);
+    for(int i=0;i<j;++i){
+        unsigned char *buf;
+        buf = (unsigned char *)malloc(6);
+        getmacaddr(ifname_list[i],buf);
+        for(int k=0;k<6;++k){
+            src_[i*6+1+k]=buf[k];
+        }
+        free(buf);
     }
     unsigned char src[j*6];
     for(int l=0;l<j*6+1;++l){

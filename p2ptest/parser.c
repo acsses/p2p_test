@@ -265,7 +265,7 @@ struct json_object * parseJson(char buf[],char search[],void * returns){
                 snprintf(ptr,256,"%s",json_object_get_string(val));
             }else if (json_object_is_type(val, json_type_array)){
                 if (json_object_is_type(json_object_array_get_idx(val, 0), json_type_string)){
-                    char (*ptr)[256]=(char (*)[256])returns;
+                    char **ptr=(char **)returns;
 
                     for (int i = 0; i < (int)json_object_array_length(val); ++i) {
                         char *p = ptr[i];
@@ -295,7 +295,7 @@ struct json_object * parseJson(char buf[],char search[],void * returns){
                     }
 
                 }else{
-                    char (*ptr)[1024]=(char (*)[1024])returns;
+                    char **ptr=(char **)returns;
 
                     for (int i = 0; i < (int)json_object_array_length(val); ++i) {
                         char *p = ptr[i];

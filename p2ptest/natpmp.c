@@ -8,7 +8,7 @@
 #include <unistd.h>  
 #include <errno.h>
 
-#include "include/timeutil.h"
+#include "include/util.h"
 #include "include/network.h"
 
 #include "include/natpmp.h"

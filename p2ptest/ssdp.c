@@ -9,7 +9,7 @@
 #include <unistd.h>//close
 #include <errno.h> //errno
 
-#include "include/timeutil.h"
+#include "include/util.h"
 #include "include/parser.h"
 #include "include/network.h"
 

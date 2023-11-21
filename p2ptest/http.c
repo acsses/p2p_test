@@ -14,7 +14,7 @@
 #include <openssl/err.h>
 
 #include "include/parser.h"
-#include "include/timeutil.h"
+#include "include/util.h"
 #include "include/network.h"
 
 #include "include/http.h"

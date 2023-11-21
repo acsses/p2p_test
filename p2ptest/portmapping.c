@@ -8,7 +8,7 @@
 
 #include "include/portmapping.h"
 
-#define DEV_MODE 1
+#define DEV_MODE 0
 
 int UpnpPortmapping(unsigned int ex_port,unsigned char gip[]){
     char *buf;
@@ -324,7 +324,6 @@ int NatpmpPortmapping(unsigned int ex_port,unsigned char gip[]){
 
     getifname(0,ifname);
 
-    printf("%s\n",ifname);
     ip = getselfip(ifname);
     subnet = getselfsubnet(ifname);
 
@@ -340,7 +339,6 @@ int NatpmpPortmapping(unsigned int ex_port,unsigned char gip[]){
         (target_int>>24)&0xFF
     );
 
-    printf("%s\n",target);
 
     if((status=requestNatpmp(buf,target,-1,-1,-1))>=0){
         if(DEV_MODE){

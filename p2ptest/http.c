@@ -56,11 +56,18 @@ int requestHttpGET(char buff[], int buf_size,char * URL,int is_local) {
         getifname(0,ifname);
         int idx = if_nametoindex(ifname);
 
+        #if defined(__APPLE__)
+            if(setsockopt(sock, IPPROTO_IP, IP_BOUND_IF, &idx, sizeof(idx))!=0){
+                printf("set sock opt error\n");
+            };
+            free(ifname);
 
-        if(setsockopt(sock, IPPROTO_IP, IP_BOUND_IF, &idx, sizeof(idx))!=0){
-            printf("set sock opt error\n");
-        };
-        free(ifname);
+        #elif defined(__linux__)
+            if(setsockopt(sock, SOL_SOCKET, SO_BINDTODEVICE, ifname, strlen(ifname))!=0){
+                printf("set sock opt error\n");
+            };
+            free(ifname);
+        #endif
 
 
         // サーバに接続
@@ -94,10 +101,18 @@ int requestHttpGET(char buff[], int buf_size,char * URL,int is_local) {
         int idx = if_nametoindex(ifname);
 
 
-        if(setsockopt(sock, IPPROTO_IP, IP_BOUND_IF, &idx, sizeof(idx))!=0){
-            printf("set sock opt error\n");
-        };
-        free(ifname);
+        #if defined(__APPLE__)
+            if(setsockopt(sock, IPPROTO_IP, IP_BOUND_IF, &idx, sizeof(idx))!=0){
+                printf("set sock opt error\n");
+            };
+            free(ifname);
+
+        #elif defined(__linux__)
+            if(setsockopt(sock, SOL_SOCKET, SO_BINDTODEVICE, ifname, strlen(ifname))!=0){
+                printf("set sock opt error\n");
+            };
+            free(ifname);
+        #endif
 
         // サーバに接続
         if (connect(sock, res->ai_addr, res->ai_addrlen) != 0) {
@@ -197,10 +212,18 @@ int requestHttpsGET(char buff[], int buf_size,char * URL) {
     int idx = if_nametoindex(ifname);
 
 
-    if(setsockopt(sock, IPPROTO_IP, IP_BOUND_IF, &idx, sizeof(idx))!=0){
-        printf("set sock opt error\n");
-    };
-    free(ifname);
+    #if defined(__APPLE__)
+        if(setsockopt(sock, IPPROTO_IP, IP_BOUND_IF, &idx, sizeof(idx))!=0){
+            printf("set sock opt error\n");
+        };
+        free(ifname);
+
+    #elif defined(__linux__)
+        if(setsockopt(sock, SOL_SOCKET, SO_BINDTODEVICE, ifname, strlen(ifname))!=0){
+            printf("set sock opt error\n");
+        };
+        free(ifname);
+    #endif
     
 
     if (connect(sock, res->ai_addr, res->ai_addrlen) < 0){
@@ -303,10 +326,18 @@ int requestHttpPOST(char buff[], int buf_size,char * URL,int is_local,char heade
         int idx = if_nametoindex(ifname);
 
 
-        if(setsockopt(sock, IPPROTO_IP, IP_BOUND_IF, &idx, sizeof(idx))!=0){
-            printf("set sock opt error\n");
-        };
-        free(ifname);
+        #if defined(__APPLE__)
+            if(setsockopt(sock, IPPROTO_IP, IP_BOUND_IF, &idx, sizeof(idx))!=0){
+                printf("set sock opt error\n");
+            };
+            free(ifname);
+
+        #elif defined(__linux__)
+            if(setsockopt(sock, SOL_SOCKET, SO_BINDTODEVICE, ifname, strlen(ifname))!=0){
+                printf("set sock opt error\n");
+            };
+            free(ifname);
+        #endif
 
         // サーバに接続
         if (connect(sock, (struct sockaddr*)&addrs, sizeof(struct sockaddr_in)) != 0) {
@@ -340,10 +371,18 @@ int requestHttpPOST(char buff[], int buf_size,char * URL,int is_local,char heade
         int idx = if_nametoindex(ifname);
 
 
-        if(setsockopt(sock, IPPROTO_IP, IP_BOUND_IF, &idx, sizeof(idx))!=0){
-            printf("set sock opt error\n");
-        };
-        free(ifname);
+        #if defined(__APPLE__)
+            if(setsockopt(sock, IPPROTO_IP, IP_BOUND_IF, &idx, sizeof(idx))!=0){
+                printf("set sock opt error\n");
+            };
+            free(ifname);
+
+        #elif defined(__linux__)
+            if(setsockopt(sock, SOL_SOCKET, SO_BINDTODEVICE, ifname, strlen(ifname))!=0){
+                printf("set sock opt error\n");
+            };
+            free(ifname);
+        #endif
 
         // サーバに接続
         if (connect(sock, res->ai_addr, res->ai_addrlen) != 0) {
@@ -451,10 +490,18 @@ int requestHttpsPOST(char buff[], int buf_size,char * URL,char header[],char bod
     int idx = if_nametoindex(ifname);
 
 
-    if(setsockopt(sock, IPPROTO_IP, IP_BOUND_IF, &idx, sizeof(idx))!=0){
-        printf("set sock opt error\n");
-    };
-    free(ifname);
+    #if defined(__APPLE__)
+        if(setsockopt(sock, IPPROTO_IP, IP_BOUND_IF, &idx, sizeof(idx))!=0){
+            printf("set sock opt error\n");
+        };
+        free(ifname);
+
+    #elif defined(__linux__)
+        if(setsockopt(sock, SOL_SOCKET, SO_BINDTODEVICE, ifname, strlen(ifname))!=0){
+            printf("set sock opt error\n");
+        };
+        free(ifname);
+    #endif
     
 
     if (connect(sock, res->ai_addr, res->ai_addrlen) < 0){

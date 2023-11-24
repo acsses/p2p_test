@@ -191,7 +191,7 @@ int getifname(int idx,char ifname[]){
 	    return 1;
     }
 
-    int i=0
+    int i=0;
 
     ifend = ifs + (ifc.ifc_len / sizeof(struct ifreq));
     for (ifr = ifc.ifc_req; ifr < ifend; ifr++) {
@@ -200,7 +200,7 @@ int getifname(int idx,char ifname[]){
 	        if (i==idx) {
 	    	    snprintf(ifname,strlen(ifr->ifr_name)+1,"%s",ifr->ifr_name);
 	        }
-            ++i
+            ++i;
 	    }
     }
     return 0;

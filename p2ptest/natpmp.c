@@ -33,10 +33,18 @@ int requestNatpmp(unsigned char buf[],char addres[],short int ex_port, short int
     int idx = if_nametoindex(ifname);
 
 
-    if(setsockopt(sock, IPPROTO_IP, IP_BOUND_IF, &idx, sizeof(idx))!=0){
-        printf("set sock opt error\n");
-    };
-    free(ifname);
+    #if defined(__APPLE__)
+            if(setsockopt(sock, IPPROTO_IP, IP_BOUND_IF, &idx, sizeof(idx))!=0){
+                printf("set sock opt error\n");
+            };
+            free(ifname);
+
+        #elif defined(__linux__)
+            if(setsockopt(sock, SOL_SOCKET, SO_BINDTODEVICE, ifname, strlen(ifname))!=0){
+                printf("set sock opt error\n");
+            };
+            free(ifname);
+        #endif
 
     addr.sin_family = AF_INET;
     addr.sin_port = htons(5351);

@@ -21,6 +21,12 @@ int main(){
     unsigned char gip[4];
 
     NatpmpPortmapping(ex_port,gip);
+    printf("global ip -> %d.%d.%d.%D",
+        gip[0],
+        gip[1],
+        gip[2],
+        gip[3],
+    );
     int sock;
     struct sockaddr_in local_addr;
 

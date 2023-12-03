@@ -50,16 +50,16 @@ static PyMethodDef p2ptest_methods[] = {
     {NULL},
 };
 
-static struct PyModuleDef p2ptest = {
+static struct PyModuleDef p2ptest_http = {
     PyModuleDef_HEAD_INIT,
-    "http",
+    "p2ptest_http",
     "Python3 C API Module for http and https request",
     -1,
     p2ptest_methods
 };
 
 //module creator
-PyMODINIT_FUNC PyInit_p2ptest(void)
+PyMODINIT_FUNC PyInit_p2ptest_http(void)
 {
-    return PyModule_Create(&p2ptest);
+    return PyModule_Create(&p2ptest_http);
 }

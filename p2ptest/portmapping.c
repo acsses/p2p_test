@@ -8,7 +8,7 @@
 
 #include "include/portmapping.h"
 
-#define DEV_MODE 0
+#define DEV_MODE 1
 
 int UpnpPortmapping(unsigned int ex_port,unsigned char gip[]){
     char *buf;

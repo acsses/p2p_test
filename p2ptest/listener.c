@@ -1,10 +1,3 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <json-c/json.h>
-#include <stdbool.h>
-
-#include <signal.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -21,53 +14,14 @@
 #include <netinet/in.h>
 #include <net/if.h>
 
-#include "p2ptest/include/portmapping.h"
-#include "p2ptest/include/parser.h"
-#include "p2ptest/include/http.h"
-#include "p2ptest/include/id.h"
-#include "p2ptest/include/message.h"
-#include "p2ptest/include/util.h"
-#include "p2ptest/include/node.h"
-#include "p2ptest/include/broadcast.h"
+#include "include/util.h"
+#include "include/node.h"
 
-volatile sig_atomic_t e_flag = 0;
-
-#define DEV_MODE 1
-
-int main(){
-    NodeStack * nodelist = initNodeList();
-    int sock;
-
-    sock = initConnection(3600,nodelist);
-    printf("%d\n",sock);
-
-    for(int i=0;i<nodelist->len;i++){
-        char buf[1024];
-        Node *return_node;
-        return_node=getNodefromNodeList(nodelist,i);
-        Node2JsonStr(return_node,buf);
-        printf("%s\n",buf);
-    }
-}
-
-void abrt_handler(int sig);
-
-
-
-int startListen(int status,int ex_port,unsigned char gip[]){
+int listener(int sock){
     long long start = gettime();
     long long now = gettime();
 
-    FILE* fp; 
-
-    int sock;
-    struct sockaddr_in local_addr;
-
-    sock = socket(AF_INET, SOCK_STREAM, 0);
-
-    local_addr.sin_family = AF_INET;
-    local_addr.sin_port = htons(ex_port);
-    local_addr.sin_addr.s_addr = INADDR_ANY;
+    int c_sock;
 
     if(bind(sock, (struct sockaddr *)&local_addr, sizeof(local_addr))==-1){
         printf("socket bind error:%s\r\n",strerror(errno));
@@ -79,20 +33,7 @@ int startListen(int status,int ex_port,unsigned char gip[]){
         return -1;
     }
 
-    int c_sock;
- 
-    if ( signal(SIGINT, abrt_handler) == SIG_ERR ) {
-      close(sock);
-      exit(1);
-    }
-    printf("start Listen!\n");
-
-    int val;
-
-    val = 1;
-    ioctl(sock, FIONBIO, &val);
-
-    while(!e_flag){
+    while(1){
 
         if((c_sock = accept(sock, NULL, NULL))==-1){
             if(errno!=EWOULDBLOCK){
@@ -118,7 +59,6 @@ int startListen(int status,int ex_port,unsigned char gip[]){
 
             }
             close(c_sock);
-
         };
 
         now=gettime();
@@ -191,10 +131,6 @@ int startListen(int status,int ex_port,unsigned char gip[]){
         }
 
     }
-    return 0;
 
-}
 
-void abrt_handler(int sig) {
-  e_flag = 1;
 }

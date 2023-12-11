@@ -8,8 +8,11 @@
 
 /*--     include libs     --*/
 
-/*--     sturuct define     --*/
-/*--     sturuct define     --*/
+/*--     macro define     --*/
+#define CONNECTION_PORTMAPPED 0
+#define CONNECTION_PORTMAPPPED_LIMITTED 1
+#define CONNECTION_NOT_PORTMAPPPED 2
+/*--     macro define     --*/
 
 /*--     type define     --*/
 struct node

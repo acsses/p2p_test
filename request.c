@@ -27,6 +27,8 @@
 #include "p2ptest/include/id.h"
 #include "p2ptest/include/message.h"
 #include "p2ptest/include/util.h"
+#include "p2ptest/include/node.h"
+#include "p2ptest/include/broadcast.h"
 
 volatile sig_atomic_t e_flag = 0;
 
@@ -37,191 +39,23 @@ volatile sig_atomic_t e_flag = 0;
 #define DEV_MODE 1
 
 int main(){
-    short int ex_port=6843;
-    char buf[2048];
-    unsigned char gip[4];
-    int statuscode;
+    NodeStack * nodelist = initNodeList();
+    int sock;
 
-    int status;
-    FILE* fp; 
+    sock = initConnection(3600,nodelist);
+    printf("%d\n",sock);
 
-    fp = fopen("table.json", "r"); 
-    fread(buf, 1, 2048, fp);
-    fclose(fp);
-
-    if(fp == NULL){
-        fprintf(stderr, "Error: file not opened.\n");
-        return 1;
-    }
-
-    printf("starting port mapping by UPnP...\n");
-    if((status=UpnpPortmapping(ex_port,gip))<0){
-        printf("port mapping by UPnP failed\n\n");
-        printf("starting port mapping by NAT-PMP...\n");
-        if ((status=NatpmpPortmapping(ex_port,gip))!=0){
-            printf("port mapping by NAT-PMP failed\n\n");
-            statuscode = CONNECTION_NOT_PORTMAPPPED;
-            
-            struct json_object *obj;
-
-            char **ds = (char **)malloc(10 * sizeof(char *));
-            for(int j = 0; j<10; ++j){
-               ds[j] = (char *)malloc(256 * sizeof(char));
-            }
-
-            obj = parseJson(buf,"discvoery_server",ds);
-            for(int i=0;ds[i][0]!=NULL;++i){
-                printf("discovery-server: %d : %s\n",i,ds[i]);
-                char *body;
-                body=(char *)malloc(2048);
-                if(body==NULL){
-                    printf("error\n");
-                }
-                messageReqNodeList(ds[i],NULL,statuscode,body);
-
-                char **nodes = (char **)malloc(10 * sizeof(char *));
-                for(int j = 0; j<10; ++j){
-                   nodes[j] = (char *)malloc(1024 * sizeof(char));
-                }
-
-                parseJson(body,"result",nodes);
-                fp = fopen("table.json", "w"); 
-                int j=0;
-
-                json_object *nodes_json = json_object_new_array();
-                for(int j=0;nodes[j][0]!=NULL;++j){
-                    int status;
-                    json_object *node =parseJson(nodes[j],"status",&status);
-                    if(status==CONNECTION_PORTMAPPED){
-                        json_object_array_add(nodes_json, node);
-                    }
-
-                }
-                json_object_object_add(obj, "node", nodes_json);
-                fprintf(fp, "%s", json_object_get_string(obj));
-                fclose(fp);
-                free(body);
-            }
-            for(int i = 0; i<10; ++i){
-               free(ds[i]);
-            }
-            free(ds);
-
-            char **ns = (char **)malloc(40 * sizeof(char *));
-            for(int i = 0; i<40; ++i){
-               ns[i] = (char *)malloc(1024 * sizeof(char));
-            }
-            parseJson(buf,"node",ns);
-            for(int i=0;ns[i][0]!=NULL;++i){
-                printf("nodes\n");
-                printf("%s\n",ns[i]);
-            }
-            for(int i = 0; i<40; ++i){
-               free(ns[i]);
-            }
-            free(ns);
-            int error=startListen(statuscode,ex_port,gip);
-            printf("%d\n",error);
-            return error;
-        }else{
-            statuscode = CONNECTION_PORTMAPPED;
-            char addr[32];
-            snprintf(addr,sizeof(addr),
-                "%d.%d.%d.%d:%d",
-                gip[0],
-                gip[1],
-                gip[2],
-                gip[3],
-                ex_port
-            );
-            struct json_object *obj;
-
-            char **ds = (char **)malloc(10 * sizeof(char *));
-            for(int j = 0; j<10; ++j){
-               ds[j] = (char *)malloc(256 * sizeof(char));
-            }
-
-            obj = parseJson(buf,"discvoery_server",ds);
-            for(int i=0;ds[i][0]!=NULL;++i){
-                char *body;
-                body=(char *)malloc(2048);
-                messageBroCasAddr(ds[i],addr[i],statuscode,body);
-
-                char **nodes = (char **)malloc(10 * sizeof(char *));
-                for(int j = 0; j<10; ++j){
-                   nodes[j] = (char *)malloc(1024 * sizeof(char));
-                }
-
-                parseJson(body,"result",nodes);
-
-                fp = fopen("table.json", "w"); 
-
-                json_object *nodes_json = json_object_new_array();
-                for(int j=0;nodes[j][0]!=NULL;++j){
-                    int status;
-                    json_object *node =parseJson(nodes[j],"status",&status);
-                    if(status==CONNECTION_PORTMAPPED){
-                        json_object_array_add(nodes_json, node);
-                    }
-                }
-                json_object_object_add(obj, "node", nodes_json);
-                fprintf(fp, "%s", json_object_get_string(obj));
-                fclose(fp);
-                free(body);
-            }
-
-            for(int i = 0; i<10; ++i){
-               free(ds[i]);
-            }
-            free(ds);
-
-
-
-            char **ns = (char **)malloc(40 * sizeof(char *));
-            for(int i = 0; i<40; ++i){
-               ns[i] = (char *)malloc(1024 * sizeof(char));
-            }
-
-            parseJson(buf,"node",ns);
-            for(int i=0;ns[i][0]!=NULL;++i){
-                char *body;
-                body=(char *)malloc(2048);
-                messageBroCasAddr(ns[i],addr[i],statuscode,body);
-
-                char **nodes = (char **)malloc(10 * sizeof(char *));
-                for(int j = 0; j<10; ++j){
-                   nodes[j] = (char *)malloc(1024 * sizeof(char));
-                }
-
-                parseJson(body,"result",nodes);
-
-                fp = fopen("table.json", "w"); 
-
-                json_object *nodes_json = json_object_new_array();
-                for(int j=0;nodes[j][0]!=NULL;++j){
-                    int status;
-                    json_object *node =parseJson(nodes[j],"status",&status);
-                    if(status==CONNECTION_PORTMAPPED){
-                        json_object_array_add(nodes_json, node);
-                    }
-                }
-                json_object_object_add(obj, "node", nodes_json);
-                fprintf(fp, "%s", json_object_get_string(obj));
-                fclose(fp);
-                free(body);
-            }
-
-            for(int i = 0; i<40; ++i){
-               free(ns[i]);
-            }
-            free(ns);
-        }
-    }else{
-
+    for(int i=0;i<nodelist->len;i++){
+        char buf[1024];
+        Node *return_node;
+        return_node=getNodefromNodeList(nodelist,i);
+        Node2JsonStr(return_node,buf);
+        printf("%s\n",buf);
     }
 }
 
 void abrt_handler(int sig);
+
 
 
 int startListen(int status,int ex_port,unsigned char gip[]){

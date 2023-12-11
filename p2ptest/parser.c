@@ -242,6 +242,10 @@ int parseXML(Http *http,char returns[],char search[]){
 
 struct json_object * parseJson(char buf[],char search[],void * returns){
     struct json_object *table = json_tokener_parse(buf);
+
+    if(search[0]=='\0'){
+        return table;
+    }
     
     json_object_object_foreach(table, key, val) {
         if(strcmp(key,search)==0){
@@ -266,6 +270,7 @@ struct json_object * parseJson(char buf[],char search[],void * returns){
             }else if (json_object_is_type(val, json_type_array)){
                 if (json_object_is_type(json_object_array_get_idx(val, 0), json_type_string)){
                     char **ptr=(char **)returns;
+
 
                     for (int i = 0; i < (int)json_object_array_length(val); ++i) {
                         char *p = ptr[i];
@@ -301,6 +306,7 @@ struct json_object * parseJson(char buf[],char search[],void * returns){
                         char *p = ptr[i];
                         struct json_object *a = json_object_array_get_idx(val, i);
                         snprintf(p,1024,"%s",json_object_get_string(a));
+                        //printf("jsonstr:%s\n",p);
                     }
                 }
             }else{

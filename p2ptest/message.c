@@ -54,7 +54,10 @@ int messageReqNodeList(char disc_server[],char address[],int status,char returns
         "Content-Length: %lu\r\n",
         strlen(content)
     );
-    requestHttpsPOST(buf,2048,url,header,content);
+    if(requestHttpsPOST(buf,2048,url,header,content)!=0){
+        return -1;
+
+    };
     parseHttp(buf,res);
     free(buf);
 

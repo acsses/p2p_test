@@ -550,13 +550,12 @@ int requestHttpsPOST(char buff[], int buf_size,char * URL,char header[],char bod
             free(buf);
             buf = NULL;
             ++i;
-        }
-        else {
+        }else {
             free(buf);
             if(i==0){
                 after=gettime();
                 if(after-before>5){
-                    break;
+                    return -1;
                 }
             }else{
                 break;

@@ -51,6 +51,7 @@ int requestHttpGET(char buff[], int buf_size,char * URL,int is_local) {
             printf("socket create error\n");
             return 1;
         }
+
         char *ifname;
         ifname = (char*)malloc(128);
         getifname(0,ifname);
@@ -68,6 +69,9 @@ int requestHttpGET(char buff[], int buf_size,char * URL,int is_local) {
             };
             free(ifname);
         #endif
+
+        int val = 1;
+        ioctl(sock, FIONBIO, &val);
 
 
         // サーバに接続
@@ -88,6 +92,9 @@ int requestHttpGET(char buff[], int buf_size,char * URL,int is_local) {
             printf("error %d\n", err);
             return 1;
         }
+
+        int val = 1;
+        ioctl(sock, FIONBIO, &val);
 
         // ソケット生成
         if ((sock = socket(res->ai_family, res->ai_socktype, res->ai_protocol)) < 0) {
@@ -141,6 +148,7 @@ int requestHttpGET(char buff[], int buf_size,char * URL,int is_local) {
         buf = (char*)malloc(1024);
         int read_size;
         read_size = read(sock, buf, 1024);
+        printf("test\n");
 
         if (read_size > 0) {
             strcat(buff, buf);
@@ -320,6 +328,9 @@ int requestHttpPOST(char buff[], int buf_size,char * URL,int is_local,char heade
             return 1;
         }
 
+        int val = 1;
+        ioctl(sock, FIONBIO, &val);
+
         char *ifname;
         ifname = (char*)malloc(128);
         getifname(0,ifname);
@@ -364,6 +375,9 @@ int requestHttpPOST(char buff[], int buf_size,char * URL,int is_local,char heade
             printf("socket create error:%s\n",strerror(errno));
             return 1;
         }
+
+        int val = 1;
+        ioctl(sock, FIONBIO, &val);
 
         char *ifname;
         ifname = (char*)malloc(128);
@@ -470,7 +484,7 @@ int requestHttpsPOST(char buff[], int buf_size,char * URL,char header[],char bod
     if ((err = getaddrinfo(url.host, serviceType, &hints, &res)) != 0) {
         printf("error %d\n", err);
         printf("%s\n",gai_strerror(err));
-        return 1;
+        return -1;
     }
 
     // サーバに送るHTTPプロトコル用バッファ
@@ -508,6 +522,7 @@ int requestHttpsPOST(char buff[], int buf_size,char * URL,char header[],char bod
         printf("connection error\n");
         return -1;
     }
+    
     SSL_load_error_strings();
     SSL_library_init();
 

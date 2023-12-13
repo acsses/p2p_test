@@ -17,8 +17,11 @@
 /*--     type define     --*/
 struct node
 {
+    int type;
     char id[128];
     int status;
+    unsigned char gip[4];
+    int ex_port;
     char addr[128];
 };
 typedef struct node Node;

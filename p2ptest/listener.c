@@ -16,58 +16,72 @@
 
 #include "include/util.h"
 #include "include/node.h"
+#include "include/message.h"
+#include "include/portmapping.h"
 
-int listener(int sock){
+#include "include/listener.h"
+
+int listener(int sock,Node * self,NodeStack *nodelist){
     long long start = gettime();
     long long now = gettime();
+    int status;
+
+    struct sockaddr_in local_addr;
+    unsigned char gip[4];
 
     int c_sock;
 
-    if(bind(sock, (struct sockaddr *)&local_addr, sizeof(local_addr))==-1){
-        printf("socket bind error:%s\r\n",strerror(errno));
-    }
+    if(sock>=0){
+        if(bind(sock, (struct sockaddr *)&local_addr, sizeof(local_addr))==-1){
+            printf("socket bind error:%s\r\n",strerror(errno));
+        }
 
-    if (listen(sock, 3) == -1) {
-        printf("\n\nlisten error\n");
-        close(sock);
-        return -1;
+        if (listen(sock, 3) == -1) {
+            printf("\n\nlisten error\n");
+            close(sock);
+            return -1;
+        }
+
     }
 
     while(1){
 
-        if((c_sock = accept(sock, NULL, NULL))==-1){
-            if(errno!=EWOULDBLOCK){
-                printf("accept error:%s\n",strerror(errno));
-                return -1;
-            }
-        }else{
-            while(1){
-                char *buff;
-                buff=(char *)malloc(2048);
+        if(sock>=0){
 
-                int recv_size;
-                recv_size = recv(c_sock, buff, 1048, 0);
-                if(recv_size==0){
-                    break;
+            if((c_sock = accept(sock, NULL, NULL))==-1){
+                if(errno!=EWOULDBLOCK){
+                    printf("accept error:%s\n",strerror(errno));
+                    return -1;
                 }
-                if(recv_size==-1){
-                    printf("%s\n",strerror(errno));
-                    break;
-                }
-                printf("%s\n",buff);
-                free(buff);
+            }else{
+                while(1){
+                    char *buff;
+                    buff=(char *)malloc(2048);
 
-            }
-            close(c_sock);
-        };
+                    int recv_size;
+                    recv_size = recv(c_sock, buff, 2048, 0);
+                    if(recv_size==0){
+                        break;
+                    }
+                    if(recv_size==-1){
+                        printf("%s\n",strerror(errno));
+                        break;
+                    }
+                    printf("%s\n",buff);
+                    free(buff);
+
+                }
+                close(c_sock);
+            };
+        }
 
         now=gettime();
 
-        if(status==CONNECTION_PORTMAPPPED_LIMITTED){
+        if(self->status==CONNECTION_PORTMAPPPED_LIMITTED){
             if (now-start>55){
                 printf("\n");
                 printf("starting port mapping by NAT-PMP...\n");
-                if ((status=NatpmpPortmapping(ex_port,gip))!=0){
+                if ((status=NatpmpPortmapping(self->ex_port,gip))!=0){
                     printf("port mapping by NAT-PMP failed\n\n");
                     printf("NAT-PMP reset error\n");
                     printf("restart init...\n\n");
@@ -75,57 +89,23 @@ int listener(int sock){
                 }
                 start=now;
             }
-        }else if(status==CONNECTION_NOT_PORTMAPPPED){
+        }else if(self->status==CONNECTION_NOT_PORTMAPPPED){
             if (now-start>5){
-                printf("\n");
-                char *buf;
-                buf = (char*)malloc(2048);
-                memset(buf,0,2048);
+                for(int i=0;i<nodelist->len;i++){
+                    Node *node = (Node*)malloc(sizeof(Node));
+                    char* blocks;
+                    blocks = (char*)malloc(2048);
 
-                struct json_object *config;
-                fp = fopen("table.json", "r"); 
+                    node=getNodefromNodeList(nodelist,i);
+                    if(messageReqBlock(node->addr,self->status,blocks)==0){
+                        printf("%s\n",blocks);
+                    };
 
-                fread(buf, 1, 2048, fp);
-                fclose(fp);
+                    free(blocks);
 
-                char **ds = (char **)malloc(10 * sizeof(char *));
-                for(int j = 0; j<10; ++j){
-                   ds[j] = (char *)malloc(256 * sizeof(char));
                 }
-
-                config = parseJson(buf,"discvoery_server",ds);
-
-                for(int i=0;ds[i][0]!=NULL;++i){
-                    char* b_list;
-                    b_list = (char*)malloc(2048);
-                    if(b_list==NULL){
-                        printf("error\n");
-                    }
-                    messageReqBlock(ds[i],status,b_list);
-                    printf("%s\n",b_list);
-                    free(b_list);
-                }
-
-                for(int i = 0; i<10; ++i){
-                   free(ds[i]);
-                }
-                free(ds);
-
-
-                char **ns = (char **)malloc(40 * sizeof(char *));
-                for(int j = 0; j<10; ++j){
-                   ns[j] = (char *)malloc(256 * sizeof(char));
-                }
-                parseJson(buf,"node",ns);
-
-                for(int i=0;ns[i][0]!=NULL;++i){
-                    printf("%s\n",ns[i]);
-                }
-
-
-                free(buf);
-
                 start=now;
+
             }
 
         }

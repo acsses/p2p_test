@@ -29,6 +29,7 @@
 #include "p2ptest/include/util.h"
 #include "p2ptest/include/node.h"
 #include "p2ptest/include/broadcast.h"
+#include "p2ptest/include/listener.h"
 
 volatile sig_atomic_t e_flag = 0;
 
@@ -36,9 +37,10 @@ volatile sig_atomic_t e_flag = 0;
 
 int main(){
     NodeStack * nodelist = initNodeList();
+    Node * self = (Node*)malloc(sizeof(Node));
     int sock;
 
-    sock = initConnection(3600,nodelist);
+    sock = initConnection(3600,self,nodelist);
     printf("%d\n",sock);
 
     for(int i=0;i<nodelist->len;i++){
@@ -48,6 +50,9 @@ int main(){
         Node2JsonStr(return_node,buf);
         printf("%s\n",buf);
     }
+
+    listener(sock,self,nodelist);
+
 }
 
 void abrt_handler(int sig);

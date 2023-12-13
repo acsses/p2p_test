@@ -50,7 +50,6 @@ int brocasReqNodeList(char path[],int status,NodeStack * nodelist,char address[]
                nodes[j] = (char *)malloc(1024 * sizeof(char));
             }
    
-   
             parseJson(body,"result",nodes);
 
             inStackNodeStack(nodes,nodelist);
@@ -85,7 +84,7 @@ int brocasReqNodeList(char path[],int status,NodeStack * nodelist,char address[]
       char buf[1024];
       Node *node = (Node *)malloc(sizeof(Node));
       node=getNodefromNodeList(nodelist,i);
-      if(node->status!=CONNECTION_NOT_PORTMAPPPED){
+      if(node->status!=CONNECTION_NOT_PORTMAPPPED && node->type!=1){
          char *body;
          body=(char *)malloc(2048);
 
@@ -101,6 +100,7 @@ int brocasReqNodeList(char path[],int status,NodeStack * nodelist,char address[]
             inStackNodeStack(nodes,nodelist);
             
             free(body);
+
    
             for(int j = 0; j<10; ++j){
                free(nodes[j]);
@@ -135,5 +135,6 @@ int inStackNodeStack(char **node_strs,NodeStack * nodelist){
       }
       free(node_obj);
    }
+   return 0;
 }
 

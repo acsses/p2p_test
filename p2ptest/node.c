@@ -4,6 +4,7 @@
 #include <string.h>
 #include <errno.h>
 #include <json-c/json.h>
+#include <arpa/inet.h>
 
 #include "include/id.h"
 #include "include/parser.h"
@@ -14,11 +15,28 @@ int getselfNode(Node *node,int status,char addr[]){
     char id[128];
     memset(id,0,128);
     getid(id);
-    
+
+    Url *parsed_addr = (Url*)malloc(sizeof(Url));
+    char *parsing_addr = (char *)malloc(1024);
+    snprintf(parsing_addr,1024,"http://%s",addr);
+    parseURL(parsing_addr,parsed_addr);
+
+    node->ex_port=parsed_addr->port;
+
+    free(parsing_addr);
+
+    int ip_src;
+
+    if(inet_pton(AF_INET, parsed_addr->host, &ip_src)){
+        for(int i=0;i<4;++i){
+            node->gip[i]=(ip_src>>(8*i))&0xFF;
+        }
+    };
     
     snprintf(node->id,128,"%s",id);
     snprintf(node->addr,128,"%s",addr);
     node->status=status;
+    node->type=0;
 
     return 0;
 }
@@ -29,15 +47,36 @@ int JsonStr2Node(Node *node,char json_str[]){
     char addr[256];
     //memset(addr,0,128);
     int status;
+    int type;
+
+    
 
     parseJson(json_str,"id",id);
     parseJson(json_str,"address",addr);
-    parseJson(json_str,"status",&status);
+    parseJson(json_str,"status",&type);
+
+    Url *parsed_addr = (Url*)malloc(sizeof(Url));
+    char *parsing_addr = (char *)malloc(1024);
+    snprintf(parsing_addr,1024,"http://%s",addr);
+    parseURL(parsing_addr,parsed_addr);
+
+    node->ex_port=parsed_addr->port;
+
+    free(parsing_addr);
+
+    int ip_src;
+
+    if(inet_pton(AF_INET, parsed_addr->host, &ip_src)){
+        for(int i=0;i<4;++i){
+            node->gip[i]=(ip_src>>(8*i))&0xFF;
+        }
+    };
 
     snprintf(node->id,128,"%s",id);
     snprintf(node->addr,128,"%s",addr);
 
     node->status=status;
+    node->type=0;
 
     return 0;
 }
@@ -46,6 +85,7 @@ int Node2JsonStr(Node *node,char json_str[]){
 
     json_object *root = json_object_new_object();
 
+    json_object_object_add(root, "type", json_object_new_int(node->type));
     json_object_object_add(root, "id", json_object_new_string(node->id));
     json_object_object_add(root, "address", json_object_new_string(node->addr));
     json_object_object_add(root, "status", json_object_new_int(node->status));
@@ -102,7 +142,6 @@ NodeStack * deleteNodefromNodeList(NodeStack * nodelist,int idx){
             Node * empty =(Node*)malloc(sizeof(Node));
             nodelist->array[i+1]=*empty;
         }else{
-            printf("test\n");
             nodelist->array[i]=nodelist->array[i+1];
         }
     }

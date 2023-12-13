@@ -14,7 +14,7 @@
 #define CONNECTION_PORTMAPPPED_LIMITTED 1
 #define CONNECTION_NOT_PORTMAPPPED 2
 
-int initConnection(short int ex_port,NodeStack * nodelist){
+int initConnection(short int ex_port,Node * self,NodeStack * nodelist){
     char buf[2048];
     unsigned char gip[4];
     int statuscode;
@@ -37,8 +37,10 @@ int initConnection(short int ex_port,NodeStack * nodelist){
         printf("starting port mapping by NAT-PMP...\n");
         if ((status=NatpmpPortmapping(ex_port,gip))!=0){
             printf("port mapping by NAT-PMP failed\n\n");
-
             statuscode = CONNECTION_NOT_PORTMAPPPED;
+            getselfNode(self,statuscode,gip);
+
+
 
             brocasReqNodeList("table.json",statuscode,nodelist,NULL);
             
@@ -55,8 +57,11 @@ int initConnection(short int ex_port,NodeStack * nodelist){
                 gip[3],
                 ex_port
             );
+
+            getselfNode(self,statuscode,addr);
             
             brocasReqNodeList("table.json",statuscode,nodelist,addr);
+            printf("test for fxxkin seg fau");
 
             return initSock(ex_port);
         }
@@ -71,6 +76,8 @@ int initConnection(short int ex_port,NodeStack * nodelist){
             gip[3],
             ex_port
         );
+
+        getselfNode(self,statuscode,addr);
         
         brocasReqNodeList("table.json",statuscode,nodelist,addr);
 

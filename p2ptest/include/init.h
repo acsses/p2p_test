@@ -18,7 +18,7 @@
 
 
 /*--   prototype declaration    --*/
-int initConnection(short int ex_port,NodeStack * nodelist);
+int initConnection(short int ex_port,Node * self,NodeStack * nodelist);
 
 int initSock(int ex_port);
 /*--   prototype declaration    --*/

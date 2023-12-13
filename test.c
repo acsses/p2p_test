@@ -87,37 +87,46 @@ int killer(pthread_t thread){
 }
 
 int main(){
-    JobQueue * work = (JobQueue *)malloc(sizeof(JobQueue));
-//
-    //Work* work = (Work*)malloc(sizeof(Work));
-    //Node* self = (Node *)malloc(sizeof(Node));
-//
-    //getselfNode(self,2,"test")
-    //initWork(work,0,self);
+    Node * self = (Node*)malloc(sizeof(Node));
+    getselfNode(self,0,"test.com");
 
-    initJobqueue(work);
-    pthread_t thread_1;
-    //pthread_t thread_2;
-//
+    printf("id:%s\n",self->id);
+    printf("export:%d\n",self->ex_port);
+    printf("addr:%s\n",self->addr);
+    printf("gip:%d.%d.%d.%d\n",self->gip[0],self->gip[1],self->gip[2],self->gip[3]);
+    printf("type:%s\n",self->type);
+    printf("status:%s\n",self->status);
+//    JobQueue * work = (JobQueue *)malloc(sizeof(JobQueue));
 ////
-    //pthread_create(&thread_1, NULL, roop1, work);
-    //pthread_create(&thread_2, NULL, roop2, work);
+//    //Work* work = (Work*)malloc(sizeof(Work));
+//    //Node* self = (Node *)malloc(sizeof(Node));
 ////
-    //pthread_join(thread_1, NULL);
-    //pthread_join(thread_2, NULL);
-
-    thread_1=starter(work);
-    printf("test2\n");
-    sleep(3);
-    Job* job = (Job*)malloc(sizeof(Job));
-    Node* self = (Node *)malloc(sizeof(Node));
-    getselfNode(self,2,"test");
-    initJob(job,0,self);
-    enJobqueue(work,job);
-    sleep(3);
-
-    killer(thread_1);
+//    //getselfNode(self,2,"test")
+//    //initWork(work,0,self);
 //
+//    initJobqueue(work);
+//    pthread_t thread_1;
+//    //pthread_t thread_2;
+////
+//////
+//    //pthread_create(&thread_1, NULL, roop1, work);
+//    //pthread_create(&thread_2, NULL, roop2, work);
+//////
+//    //pthread_join(thread_1, NULL);
+//    //pthread_join(thread_2, NULL);
+//
+//    thread_1=starter(work);
+//    printf("test2\n");
+//    sleep(3);
+//    Job* job = (Job*)malloc(sizeof(Job));
+//    Node* self = (Node *)malloc(sizeof(Node));
+//    getselfNode(self,2,"test");
+//    initJob(job,0,self);
+//    enJobqueue(work,job);
+//    sleep(3);
+//
+//    killer(thread_1);
+////
     
 }
 

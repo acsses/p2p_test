@@ -570,6 +570,7 @@ int requestHttpsPOST(char buff[], int buf_size,char * URL,char header[],char bod
             if(i==0){
                 after=gettime();
                 if(after-before>5){
+                    printf("timeout\n");
                     return -1;
                 }
             }else{

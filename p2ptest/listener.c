@@ -13,11 +13,13 @@
 #include <stdlib.h>
 #include <netinet/in.h>
 #include <net/if.h>
+#include <json-c/json.h>
 
 #include "include/util.h"
 #include "include/node.h"
 #include "include/message.h"
 #include "include/portmapping.h"
+#include "include/broadcast.h"
 
 #include "include/listener.h"
 
@@ -32,9 +34,6 @@ int listener(int sock,Node * self,NodeStack *nodelist){
     int c_sock;
 
     if(sock>=0){
-        if(bind(sock, (struct sockaddr *)&local_addr, sizeof(local_addr))==-1){
-            printf("socket bind error:%s\r\n",strerror(errno));
-        }
 
         if (listen(sock, 3) == -1) {
             printf("\n\nlisten error\n");
@@ -91,21 +90,60 @@ int listener(int sock,Node * self,NodeStack *nodelist){
             }
         }else if(self->status==CONNECTION_NOT_PORTMAPPPED){
             if (now-start>5){
+                int flg=0;
                 for(int i=0;i<nodelist->len;i++){
                     Node *node = (Node*)malloc(sizeof(Node));
                     char* blocks;
                     blocks = (char*)malloc(2048);
 
                     node=getNodefromNodeList(nodelist,i);
-                    if(messageReqBlock(node->addr,self->status,blocks)==0){
-                        printf("%s\n",blocks);
-                    };
+                    if(node->status!=CONNECTION_NOT_PORTMAPPPED){
+                        if(messageReqBlock(node->addr,self->status,blocks)==0){
+                            flg=1;
+                            printf("%s\n",blocks);
+                        }else{
+                            deleteNodefromNodeList(nodelist,i);
+                            node->status=CONNECTION_NOT_PORTMAPPPED;
+                            appendNodeList(nodelist,node);
+                        }
 
-                    free(blocks);
+                        free(blocks);
+                    }
+                }
+
+                if(flg==0){
+                    char *buf;
+                    FILE* fp;
+                    struct json_object *obj;
+
+                    buf=(char*)malloc(2048);
+
+                    fp = fopen("table.json", "r"); 
+                    fread(buf, 1, 2048, fp);
+                    fclose(fp);
+                    char **ds = (char **)malloc(10 * sizeof(char *));
+                    for(int j = 0; j<10; ++j){
+                        ds[j] = (char *)malloc(256 * sizeof(char));
+                    }
+                    /* parsing json */
+                    parseJson(buf,"discvoery_server",ds);
+                    for(int i=0;ds[i][0]!=NULL;++i){
+                        char* blocks;
+                        blocks = (char*)malloc(2048);
+
+                        printf("discovery-server : %d : %s\n",i,ds[i]);
+                        if(messageReqBlock(ds[i],self->status,blocks)==0){
+                            printf("blocks:%s\n",blocks);
+                        }
+                        free(blocks);
+                    }
+                    for(int i = 0; i<10; ++i){
+                       free(ds[i]);
+                    }
+                    free(ds);
 
                 }
                 start=now;
-
             }
 
         }

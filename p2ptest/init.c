@@ -46,7 +46,7 @@ int initConnection(short int ex_port,Node * self,NodeStack * nodelist){
             
             return -1;
         }else{
-            statuscode = CONNECTION_PORTMAPPED;
+            statuscode = CONNECTION_PORTMAPPPED_LIMITTED;
 
             char addr[32];
             snprintf(addr,sizeof(addr),
@@ -61,7 +61,7 @@ int initConnection(short int ex_port,Node * self,NodeStack * nodelist){
             getselfNode(self,statuscode,addr);
             
             brocasReqNodeList("table.json",statuscode,nodelist,addr);
-            printf("test for fxxkin seg fau");
+            printf("test for fxxkin seg fau\n");
 
             return initSock(ex_port);
         }

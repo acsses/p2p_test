@@ -43,13 +43,13 @@ int main(){
     sock = initConnection(3600,self,nodelist);
     printf("%d\n",sock);
 
-    for(int i=0;i<nodelist->len;i++){
-        char buf[1024];
-        Node *return_node;
-        return_node=getNodefromNodeList(nodelist,i);
-        Node2JsonStr(return_node,buf);
-        printf("%s\n",buf);
-    }
+    //for(int i=0;i<nodelist->len;i++){
+    //    char buf[1024];
+    //    Node *return_node;
+    //    return_node=getNodefromNodeList(nodelist,i);
+    //    Node2JsonStr(return_node,buf);
+    //    printf("%s\n",buf);
+    //}
 
     listener(sock,self,nodelist);
 

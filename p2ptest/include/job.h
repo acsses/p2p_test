@@ -12,7 +12,7 @@
 /*--     include libs     --*/
 
 /*--     macro define     --*/
-#define QUEUE_MAX_LEN 64
+#define QUEUE_MAX_LEN 65
 
 #define WORK_EMPTY -1
 #define WORK_REQ_NODE_LIST 0

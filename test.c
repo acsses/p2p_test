@@ -3,10 +3,27 @@
 #include <string.h>
 #include <pthread.h>
 #include <unistd.h>
+#include <json-c/json.h>
 
 #include "p2ptest/include/util.h"
 #include "p2ptest/include/node.h"
 #include "p2ptest/include/job.h"
+#include "p2ptest/include/sha256.h"
+#include "p2ptest/include/block.h"
+struct block_stack{
+    Block * array;
+    int32_t len;
+};
+
+int verifyBlock(Block * block,char cid[]);
+
+int initBlock(Block * block,char content[],char orient[]);
+
+int JsonStr2Block(Block *block,char json_str[]);
+
+int Block2JsonStr(Block *block,char json_str[]);
+
+int initBlockQueue(BlockQueue * queue);
 
 void* roop1(void * works){
     long long start_origin = gettime();
@@ -87,15 +104,42 @@ int killer(pthread_t thread){
 }
 
 int main(){
-    Node * self = (Node*)malloc(sizeof(Node));
-    getselfNode(self,0,"test.com");
+    BlockQueue * queue = (Block *)malloc(sizeof(BlockQueue));
 
-    printf("id:%s\n",self->id);
-    printf("export:%d\n",self->ex_port);
-    printf("addr:%s\n",self->addr);
-    printf("gip:%d.%d.%d.%d\n",self->gip[0],self->gip[1],self->gip[2],self->gip[3]);
-    printf("type:%s\n",self->type);
-    printf("status:%s\n",self->status);
+    initBlockQueue(queue);
+
+    Block * block = (Block *)malloc(sizeof(Block));
+    char jsonstr[2048];
+
+    initBlock(block,"hello world!","\0");
+    //printf("%s\n",block->cid);
+    //printf("%s\n",block->content);
+    //printf("%s\n",block->orient);
+    Block2JsonStr(block,jsonstr);
+    //printf("%s\n",jsonstr);
+
+    enBlockQueue(queue,block);
+
+    for (int i = queue->head;(i% MAX_LEN ) <= queue->tail;++i ){
+        char re_jsonstr[2048];
+        Block * re_block = &(queue->array[i]);
+        Block * re_re_block = (Block *)malloc(sizeof(Block));
+        Block2JsonStr(re_block,re_jsonstr);
+        printf("%s\n",re_jsonstr);
+        JsonStr2Block(re_re_block,re_jsonstr);
+
+        printf("%s\n",re_re_block->cid);
+        printf("%s\n",re_re_block->content);
+        printf("%s\n",re_re_block->orient);
+
+    }
+
+    Block2JsonStr(block,jsonstr);
+
+    return 0;
+
+
+
 //    JobQueue * work = (JobQueue *)malloc(sizeof(JobQueue));
 ////
 //    //Work* work = (Work*)malloc(sizeof(Work));

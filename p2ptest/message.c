@@ -153,6 +153,6 @@ int messageReqBlock(char addr[],int status,char returns[]){
 
     snprintf(returns,2048,"%s",res->Body);
     free(buf);
-    return 1;
+    return 0;
 
 }
